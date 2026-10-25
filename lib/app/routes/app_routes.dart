@@ -1,3 +1,4 @@
+// ignore_for_file: constant_identifier_names
 part of 'app_pages.dart';
 // DO NOT EDIT. This is code generated via package:get_cli/get_cli.dart
 
@@ -21,7 +22,6 @@ abstract class Routes {
   static const TRIP_LIST = _Paths.TRANSPORT + _Paths.TRIP_LIST;
   static const ROOM_SELECTION = _Paths.HOTEL + _Paths.ROOM_SELECTION;
   static const SPLASH_SCREEN = _Paths.START + _Paths.SPLASH_SCREEN;
-  static const PROFILES = _Paths.PROFILES;
 }
 
 abstract class _Paths {
@@ -44,5 +44,4 @@ abstract class _Paths {
   static const TRIP_LIST = '/trip-list';
   static const ROOM_SELECTION = '/room-selection';
   static const SPLASH_SCREEN = '/splash-screen';
-  static const PROFILES = '/profiles';
 }
