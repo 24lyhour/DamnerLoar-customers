@@ -18,6 +18,7 @@ import '../modules/payment/bindings/payment_binding.dart';
 import '../modules/payment/views/payment_view.dart';
 import '../modules/profile/bindings/profile_binding.dart';
 import '../modules/profile/views/profile_view.dart';
+
 import '../modules/promotions/bindings/promotions_binding.dart';
 import '../modules/promotions/views/promotions_view.dart';
 import '../modules/saved/bindings/saved_binding.dart';
@@ -25,6 +26,8 @@ import '../modules/saved/views/saved_view.dart';
 import '../modules/start/bindings/start_binding.dart';
 import '../modules/start/onboard_screen/bindings/onboard_screen_binding.dart';
 import '../modules/start/onboard_screen/views/onboard_screen_view.dart';
+import '../modules/start/splash_screen/bindings/splash_screen_binding.dart';
+import '../modules/start/splash_screen/views/splash_screen_view.dart';
 import '../modules/start/views/start_view.dart';
 import '../modules/transport/bindings/transport_binding.dart';
 import '../modules/transport/passenger_info/bindings/passenger_info_binding.dart';
@@ -131,6 +134,11 @@ class AppPages {
           name: _Paths.ONBOARD_SCREEN,
           page: () => const OnboardScreenView(),
           binding: OnboardScreenBinding(),
+        ),
+        GetPage(
+          name: _Paths.SPLASH_SCREEN,
+          page: () => const SplashScreenView(),
+          binding: SplashScreenBinding(),
         ),
       ],
     ),

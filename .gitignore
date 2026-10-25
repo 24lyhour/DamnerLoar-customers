@@ -52,3 +52,6 @@ app.*.map.json
 .env
 .env.*
 !.env.example
+
+# lifecycle
+DamnerLaor_Customer_App_UIUX_v3.1.pdf
