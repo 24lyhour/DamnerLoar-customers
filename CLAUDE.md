@@ -154,7 +154,37 @@ get generate model with assets/models/<name>.json --skipProvider                
 
 ---
 
-## 7. New module checklist
+## 7. Flavors
+
+| Flavor | Entry point | App ID (Android & iOS) | App name | Banner |
+|---|---|---|---|---|
+| dev | `lib/main_dev.dart` | `com.damnerloar.customers.dev` | DamnerLoar Dev | red DEV |
+| staging | `lib/main_staging.dart` | `com.damnerloar.customers.staging` | DamnerLoar Staging | orange STAGING |
+| prod | `lib/main_prod.dart` | `com.damnerloar.customers` | DamnerLoar | none |
+
+```bash
+flutter run --flavor dev -t lib/main_dev.dart
+flutter build apk --release --flavor prod -t lib/main_prod.dart
+flutter build ipa --flavor prod -t lib/main_prod.dart
+```
+
+- Always pass both `--flavor` and `-t`. VS Code launch configs are in `.vscode/launch.json`.
+- Startup lives in `lib/bootstrap.dart`. The `main_*.dart` files only call `bootstrap(AppFlavor.x)`.
+- Per-flavor values (API base URL...) live in `lib/app/config/flavor_config.dart` and are read through `AppConfig` (`AppConfig.baseUrl`, `AppConfig.isProd`). Never hard-code an environment URL anywhere else.
+- Android: `productFlavors` in `android/app/build.gradle.kts`; app name comes from `resValue("string", "app_name", ...)`.
+- iOS: build configurations are `Debug-<flavor>`, `Release-<flavor>`, `Profile-<flavor>`, with one scheme per flavor. The bundle ID and `APP_DISPLAY_NAME` are set per configuration in Xcode build settings.
+- When a native plugin makes Flutter generate `ios/Podfile`, map the flavor configurations in it:
+  ```ruby
+  project 'Runner', {
+    'Debug-dev' => :debug, 'Profile-dev' => :release, 'Release-dev' => :release,
+    'Debug-staging' => :debug, 'Profile-staging' => :release, 'Release-staging' => :release,
+    'Debug-prod' => :debug, 'Profile-prod' => :release, 'Release-prod' => :release,
+  }
+  ```
+
+---
+
+## 8. New module checklist
 
 - [ ] Created with `get create page:` so the route and binding are registered
 - [ ] Folder shape matches section 2

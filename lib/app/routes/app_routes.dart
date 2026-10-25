@@ -22,6 +22,7 @@ abstract class Routes {
   static const TRIP_LIST = _Paths.TRANSPORT + _Paths.TRIP_LIST;
   static const ROOM_SELECTION = _Paths.HOTEL + _Paths.ROOM_SELECTION;
   static const SPLASH_SCREEN = _Paths.START + _Paths.SPLASH_SCREEN;
+  static const LANGUAGE = _Paths.START + _Paths.LANGUAGE;
 }
 
 abstract class _Paths {
@@ -44,4 +45,5 @@ abstract class _Paths {
   static const TRIP_LIST = '/trip-list';
   static const ROOM_SELECTION = '/room-selection';
   static const SPLASH_SCREEN = '/splash-screen';
+  static const LANGUAGE = '/language';
 }

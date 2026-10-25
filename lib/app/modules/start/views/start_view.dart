@@ -9,15 +9,9 @@ class StartView extends GetView<StartController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('StartView'),
-        centerTitle: true,
-      ),
+      appBar: AppBar(title: const Text('StartView'), centerTitle: true),
       body: const Center(
-        child: Text(
-          'StartView is working',
-          style: TextStyle(fontSize: 20),
-        ),
+        child: Text('StartView is working', style: TextStyle(fontSize: 20)),
       ),
     );
   }

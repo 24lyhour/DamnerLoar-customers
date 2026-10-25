@@ -1,5 +1,6 @@
 // ignore_for_file: constant_identifier_names
 
+import 'package:flutter/animation.dart';
 import 'package:get/get.dart';
 
 import '../modules/booking/bindings/booking_binding.dart';
@@ -26,6 +27,8 @@ import '../modules/promotions/views/promotions_view.dart';
 import '../modules/saved/bindings/saved_binding.dart';
 import '../modules/saved/views/saved_view.dart';
 import '../modules/start/bindings/start_binding.dart';
+import '../modules/start/language/bindings/language_binding.dart';
+import '../modules/start/language/views/language_view.dart';
 import '../modules/start/onboard_screen/bindings/onboard_screen_binding.dart';
 import '../modules/start/onboard_screen/views/onboard_screen_view.dart';
 import '../modules/start/splash_screen/bindings/splash_screen_binding.dart';
@@ -52,6 +55,9 @@ class AppPages {
       name: _Paths.HOME,
       page: () => const HomeView(),
       binding: HomeBinding(),
+      transition: Transition.fadeIn,
+      transitionDuration: const Duration(milliseconds: 400),
+      curve: Curves.easeOut,
     ),
     GetPage(
       name: _Paths.TRANSPORT,
@@ -136,11 +142,24 @@ class AppPages {
           name: _Paths.ONBOARD_SCREEN,
           page: () => const OnboardScreenView(),
           binding: OnboardScreenBinding(),
+          transition: Transition.fadeIn,
+          transitionDuration: const Duration(milliseconds: 400),
+          curve: Curves.easeOut,
         ),
         GetPage(
           name: _Paths.SPLASH_SCREEN,
           page: () => const SplashScreenView(),
           binding: SplashScreenBinding(),
+          // fade (not slide) so leaving the splash has no iOS parallax shadow
+          transition: Transition.fadeIn,
+        ),
+        GetPage(
+          name: _Paths.LANGUAGE,
+          page: () => const LanguageView(),
+          binding: LanguageBinding(),
+          transition: Transition.fadeIn,
+          transitionDuration: const Duration(milliseconds: 400),
+          curve: Curves.easeOut,
         ),
       ],
     ),
