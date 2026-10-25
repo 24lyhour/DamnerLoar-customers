@@ -16,6 +16,10 @@ abstract class Routes {
   static const LOCATIONS = _Paths.LOCATIONS;
   static const START = _Paths.START;
   static const ONBOARD_SCREEN = _Paths.START + _Paths.ONBOARD_SCREEN;
+  static const PASSENGER_INFO = _Paths.TRANSPORT + _Paths.PASSENGER_INFO;
+  static const SEAT_SELECTION = _Paths.TRANSPORT + _Paths.SEAT_SELECTION;
+  static const TRIP_LIST = _Paths.TRANSPORT + _Paths.TRIP_LIST;
+  static const ROOM_SELECTION = _Paths.HOTEL + _Paths.ROOM_SELECTION;
 }
 
 abstract class _Paths {
@@ -33,4 +37,8 @@ abstract class _Paths {
   static const LOCATIONS = '/locations';
   static const START = '/start';
   static const ONBOARD_SCREEN = '/onboard-screen';
+  static const PASSENGER_INFO = '/passenger-info';
+  static const SEAT_SELECTION = '/seat-selection';
+  static const TRIP_LIST = '/trip-list';
+  static const ROOM_SELECTION = '/room-selection';
 }

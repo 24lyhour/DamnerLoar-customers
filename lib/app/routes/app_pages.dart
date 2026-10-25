@@ -5,6 +5,8 @@ import '../modules/booking/views/booking_view.dart';
 import '../modules/home/bindings/home_binding.dart';
 import '../modules/home/views/home_view.dart';
 import '../modules/hotel/bindings/hotel_binding.dart';
+import '../modules/hotel/room_selection/bindings/room_selection_binding.dart';
+import '../modules/hotel/room_selection/views/room_selection_view.dart';
 import '../modules/hotel/views/hotel_view.dart';
 import '../modules/locations/bindings/locations_binding.dart';
 import '../modules/locations/views/locations_view.dart';
@@ -25,6 +27,12 @@ import '../modules/start/onboard_screen/bindings/onboard_screen_binding.dart';
 import '../modules/start/onboard_screen/views/onboard_screen_view.dart';
 import '../modules/start/views/start_view.dart';
 import '../modules/transport/bindings/transport_binding.dart';
+import '../modules/transport/passenger_info/bindings/passenger_info_binding.dart';
+import '../modules/transport/passenger_info/views/passenger_info_view.dart';
+import '../modules/transport/seat_selection/bindings/seat_selection_binding.dart';
+import '../modules/transport/seat_selection/views/seat_selection_view.dart';
+import '../modules/transport/trip_list/bindings/trip_list_binding.dart';
+import '../modules/transport/trip_list/views/trip_list_view.dart';
 import '../modules/transport/views/transport_view.dart';
 
 part 'app_routes.dart';
@@ -44,11 +52,35 @@ class AppPages {
       name: _Paths.TRANSPORT,
       page: () => const TransportView(),
       binding: TransportBinding(),
+      children: [
+        GetPage(
+          name: _Paths.PASSENGER_INFO,
+          page: () => const PassengerInfoView(),
+          binding: PassengerInfoBinding(),
+        ),
+        GetPage(
+          name: _Paths.SEAT_SELECTION,
+          page: () => const SeatSelectionView(),
+          binding: SeatSelectionBinding(),
+        ),
+        GetPage(
+          name: _Paths.TRIP_LIST,
+          page: () => const TripListView(),
+          binding: TripListBinding(),
+        ),
+      ],
     ),
     GetPage(
       name: _Paths.HOTEL,
       page: () => const HotelView(),
       binding: HotelBinding(),
+      children: [
+        GetPage(
+          name: _Paths.ROOM_SELECTION,
+          page: () => const RoomSelectionView(),
+          binding: RoomSelectionBinding(),
+        ),
+      ],
     ),
     GetPage(
       name: _Paths.PACKAGE,
