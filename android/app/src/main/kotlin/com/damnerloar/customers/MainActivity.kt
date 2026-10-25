@@ -1,4 +1,4 @@
-package com.example.damner_loar_customers
+package com.damnerloar.customers
 
 import io.flutter.embedding.android.FlutterActivity
 

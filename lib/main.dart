@@ -1,18 +1,5 @@
-import 'package:flutter/material.dart';
+import 'app/config/flavor_config.dart';
+import 'bootstrap.dart';
 
-import 'package:get/get.dart';
-
-import 'app/core/theme/app_theme.dart';
-import 'app/routes/app_pages.dart';
-
-void main() {
-  runApp(
-    GetMaterialApp(
-      title: "DamnerLoar",
-      debugShowCheckedModeBanner: false,
-      theme: AppTheme.lightTheme,
-      initialRoute: AppPages.INITIAL,
-      getPages: AppPages.routes,
-    ),
-  );
-}
+/// Default entry point runs dev. Prefer the explicit `main_<flavor>.dart` files.
+void main() => bootstrap(AppFlavor.dev);
