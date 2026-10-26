@@ -15,18 +15,26 @@ abstract class AppTextStyle {
 
   /// Screen headline, e.g. "Choose your language".
   static TextStyle get headline => _style(24, FontWeight.w700);
+  static TextStyle get headlineSmall => _style(20, FontWeight.w600);
 
   /// Title · Inter Bold 20, e.g. "Where are you going?".
   static TextStyle get title => _style(20, FontWeight.w700);
+  static TextStyle get titleMedium => _style(18, FontWeight.w600);
 
   static TextStyle get subtitle => _style(16, FontWeight.w600);
 
   /// Body · Inter Regular 14.
   static TextStyle get body => _style(14, FontWeight.w400);
+  static TextStyle get bodyMedium => _style(14, FontWeight.w400);
+  static TextStyle get bodySmall => _style(12, FontWeight.w400);
   static TextStyle get bodySecondary => _style(14, FontWeight.w400, AppColor.textSecondary);
   static TextStyle get bodyBold => _style(14, FontWeight.w600);
 
   static TextStyle get caption => _style(12, FontWeight.w400, AppColor.textSecondary);
+
+  /// Labels for buttons and form fields.
+  static TextStyle get labelLarge => _style(16, FontWeight.w600);
+  static TextStyle get labelMedium => _style(14, FontWeight.w500);
 
   static TextStyle get button => _style(16, FontWeight.w600);
 }

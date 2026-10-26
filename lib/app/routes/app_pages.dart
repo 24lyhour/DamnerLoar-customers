@@ -21,16 +21,21 @@ import '../modules/payment/bindings/payment_binding.dart';
 import '../modules/payment/views/payment_view.dart';
 import '../modules/profile/bindings/profile_binding.dart';
 import '../modules/profile/views/profile_view.dart';
-
 import '../modules/promotions/bindings/promotions_binding.dart';
 import '../modules/promotions/views/promotions_view.dart';
 import '../modules/saved/bindings/saved_binding.dart';
 import '../modules/saved/views/saved_view.dart';
 import '../modules/start/bindings/start_binding.dart';
+import '../modules/start/complete_profile/bindings/complete_profile_binding.dart';
+import '../modules/start/complete_profile/views/complete_profile_view.dart';
 import '../modules/start/language/bindings/language_binding.dart';
 import '../modules/start/language/views/language_view.dart';
+import '../modules/start/login/bindings/login_binding.dart';
+import '../modules/start/login/views/login_view.dart';
 import '../modules/start/onboard_screen/bindings/onboard_screen_binding.dart';
 import '../modules/start/onboard_screen/views/onboard_screen_view.dart';
+import '../modules/start/otp_verification/bindings/otp_verification_binding.dart';
+import '../modules/start/otp_verification/views/otp_verification_view.dart';
 import '../modules/start/splash_screen/bindings/splash_screen_binding.dart';
 import '../modules/start/splash_screen/views/splash_screen_view.dart';
 import '../modules/start/views/start_view.dart';
@@ -150,7 +155,6 @@ class AppPages {
           name: _Paths.SPLASH_SCREEN,
           page: () => const SplashScreenView(),
           binding: SplashScreenBinding(),
-          // fade (not slide) so leaving the splash has no iOS parallax shadow
           transition: Transition.fadeIn,
         ),
         GetPage(
@@ -159,6 +163,30 @@ class AppPages {
           binding: LanguageBinding(),
           transition: Transition.fadeIn,
           transitionDuration: const Duration(milliseconds: 400),
+          curve: Curves.easeOut,
+        ),
+        GetPage(
+          name: _Paths.LOGIN,
+          page: () => const LoginView(),
+          binding: LoginBinding(),
+          transition: Transition.rightToLeft,
+          transitionDuration: const Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+        ),
+        GetPage(
+          name: _Paths.OTP_VERIFICATION,
+          page: () => const OtpVerificationView(),
+          binding: OtpVerificationBinding(),
+          transition: Transition.rightToLeft,
+          transitionDuration: const Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+        ),
+        GetPage(
+          name: _Paths.COMPLETE_PROFILE,
+          page: () => const CompleteProfileView(),
+          binding: CompleteProfileBinding(),
+          transition: Transition.rightToLeft,
+          transitionDuration: const Duration(milliseconds: 300),
           curve: Curves.easeOut,
         ),
       ],

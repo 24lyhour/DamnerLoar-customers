@@ -19,6 +19,7 @@ abstract class AppColor {
   // Text (neutral greys, for text and lines only)
   static const Color textPrimary = Color(0xFF1B2533);
   static const Color textSecondary = Color(0xFF6B7685);
+  static const Color textTertiary = Color(0xFF9CA3AF);
   static const Color textOnPrimary = Color(0xFFFFFFFF);
 
   // Borders and dividers
@@ -27,5 +28,6 @@ abstract class AppColor {
 
   // Status colours (functional, not brand)
   static const Color success = Color(0xFF10B981);
+  static const Color warning = Color(0xFFF59E0B);
   static const Color error = Color(0xFFEF4444);
 }

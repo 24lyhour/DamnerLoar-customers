@@ -23,6 +23,9 @@ abstract class Routes {
   static const ROOM_SELECTION = _Paths.HOTEL + _Paths.ROOM_SELECTION;
   static const SPLASH_SCREEN = _Paths.START + _Paths.SPLASH_SCREEN;
   static const LANGUAGE = _Paths.START + _Paths.LANGUAGE;
+  static const LOGIN = _Paths.START + _Paths.LOGIN;
+  static const OTP_VERIFICATION = _Paths.START + _Paths.OTP_VERIFICATION;
+  static const COMPLETE_PROFILE = _Paths.START + _Paths.COMPLETE_PROFILE;
 }
 
 abstract class _Paths {
@@ -46,4 +49,7 @@ abstract class _Paths {
   static const ROOM_SELECTION = '/room-selection';
   static const SPLASH_SCREEN = '/splash-screen';
   static const LANGUAGE = '/language';
+  static const LOGIN = '/login';
+  static const OTP_VERIFICATION = '/otp-verification';
+  static const COMPLETE_PROFILE = '/complete-profile';
 }

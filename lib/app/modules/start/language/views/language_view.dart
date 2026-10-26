@@ -7,7 +7,7 @@ import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/constants/app_string.dart';
 import '../../../../core/theme/app_color.dart';
 import '../../../../core/theme/app_text_style.dart';
-import '../../../../core/widgets/app_logo.dart';
+import '../../../../core/widgets/app_logo_widget.dart';
 import '../controllers/language_controller.dart';
 import '../widgets/language_option_tile.dart';
 
@@ -35,10 +35,7 @@ class LanguageView extends GetView<LanguageController> {
                       shape: BoxShape.circle,
                     ),
                     alignment: Alignment.center,
-                    child: const AppLogo(
-                      size: 110,
-                      background: AppColor.surface,
-                    ),
+                    child: const AppLogo(size: 110),
                   ),
                   const SizedBox(height: AppSpacing.xl),
                   Text(

@@ -26,9 +26,12 @@ class LanguageController extends GetxController {
 
   Future<void> confirm() async {
     await StorageService.to.setLanguageCode(selected.value);
-    Get.offAllNamed(Routes.HOME);
+    Get.toNamed(Routes.LOGIN);
   }
 
   /// Guests can search and browse everything; login is only needed at checkout.
-  Future<void> browseAsGuest() => confirm();
+  Future<void> browseAsGuest() async {
+    await StorageService.to.setLanguageCode(selected.value);
+    Get.offAllNamed(Routes.HOME);
+  }
 }

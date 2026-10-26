@@ -4,7 +4,7 @@ import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/constants/app_string.dart';
 import '../../../../core/theme/app_color.dart';
 import '../../../../core/theme/app_text_style.dart';
-import '../../../../core/widgets/app_logo.dart';
+import '../../../../core/widgets/app_logo_widget.dart';
 
 /// Logo, names and tagline with a staggered entrance:
 /// logo fades and settles in, then each line rises into place.
