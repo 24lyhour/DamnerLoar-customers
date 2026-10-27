@@ -6,6 +6,8 @@ import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/theme/app_color.dart';
 import '../../../../core/theme/app_text_style.dart';
 import '../../../../core/widgets/app_button_widget.dart';
+import '../../../../core/widgets/seat_layout_widget.dart';
+import '../../data/models/transport_model.dart';
 import '../controllers/passenger_info_controller.dart';
 
 class PassengerInfoView extends GetView<PassengerInfoController> {
@@ -35,8 +37,28 @@ class PassengerInfoView extends GetView<PassengerInfoController> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Trip summary
-                    _buildTripSummary(),
+                    // Trip summaries
+                    Obx(() {
+                      if (controller.isRoundTrip.value) {
+                        return Column(
+                          children: [
+                            _buildTripSummaryCard(
+                              label: 'Outbound',
+                              trip: controller.outboundTrip,
+                              seats: controller.outboundSeats,
+                            ),
+                            const SizedBox(height: AppSpacing.sm),
+                            if (controller.returnTrip != null)
+                              _buildTripSummaryCard(
+                                label: 'Return',
+                                trip: controller.returnTrip!,
+                                seats: controller.returnSeats!,
+                              ),
+                          ],
+                        );
+                      }
+                      return _buildTripSummary();
+                    }),
                     const SizedBox(height: AppSpacing.lg),
 
                     // Passenger forms
@@ -191,6 +213,138 @@ class PassengerInfoView extends GetView<PassengerInfoController> {
               Text(
                 'Seats: ${controller.seats.map((s) => s.label).join(", ")}',
                 style: AppTextStyle.bodySmall.copyWith(
+                  color: AppColor.primary,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTripSummaryCard({
+    required String label,
+    required TripModel trip,
+    required List<Seat> seats,
+  }) {
+    final timeFormat = DateFormat('HH:mm');
+    final dateFormat = DateFormat('EEE, d MMM');
+
+    return Container(
+      padding: const EdgeInsets.all(AppSpacing.md),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+        border: Border.all(color: AppColor.border),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Label badge
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            decoration: BoxDecoration(
+              color: label == 'Outbound'
+                  ? AppColor.primary.withAlpha(20)
+                  : AppColor.success.withAlpha(20),
+              borderRadius: BorderRadius.circular(4),
+            ),
+            child: Text(
+              label,
+              style: AppTextStyle.caption.copyWith(
+                color: label == 'Outbound' ? AppColor.primary : AppColor.success,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+          const SizedBox(height: AppSpacing.sm),
+
+          // Operator row
+          Row(
+            children: [
+              Container(
+                width: 36,
+                height: 36,
+                decoration: BoxDecoration(
+                  color: AppColor.primary.withAlpha(25),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Center(
+                  child: Icon(Icons.directions_bus, color: AppColor.primary, size: 18),
+                ),
+              ),
+              const SizedBox(width: AppSpacing.sm),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      trip.operatorName,
+                      style: AppTextStyle.bodySmall.copyWith(fontWeight: FontWeight.w600),
+                    ),
+                    Text(
+                      trip.busType,
+                      style: AppTextStyle.caption.copyWith(color: AppColor.textSecondary),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const Divider(height: AppSpacing.md),
+
+          // Time row
+          Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      timeFormat.format(trip.departureTime),
+                      style: AppTextStyle.bodyMedium.copyWith(fontWeight: FontWeight.bold),
+                    ),
+                    Text(
+                      trip.fromCity,
+                      style: AppTextStyle.caption.copyWith(color: AppColor.textSecondary),
+                    ),
+                  ],
+                ),
+              ),
+              Text(trip.durationText, style: AppTextStyle.caption.copyWith(color: AppColor.textSecondary)),
+              const Icon(Icons.arrow_forward, size: 14, color: AppColor.textSecondary),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text(
+                      timeFormat.format(trip.arrivalTime),
+                      style: AppTextStyle.bodyMedium.copyWith(fontWeight: FontWeight.bold),
+                    ),
+                    Text(
+                      trip.toCity,
+                      style: AppTextStyle.caption.copyWith(color: AppColor.textSecondary),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const Divider(height: AppSpacing.md),
+
+          // Date and seats
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                dateFormat.format(trip.departureTime),
+                style: AppTextStyle.caption.copyWith(color: AppColor.textSecondary),
+              ),
+              Text(
+                'Seats: ${seats.map((s) => s.label).join(", ")}',
+                style: AppTextStyle.caption.copyWith(
                   color: AppColor.primary,
                   fontWeight: FontWeight.w500,
                 ),

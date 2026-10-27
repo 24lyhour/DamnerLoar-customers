@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 
+import '../../../../core/helpers/toast_helper.dart';
 import '../../../../core/services/storage_service.dart';
 import '../../../../core/widgets/seat_layout_widget.dart';
+import '../../../../routes/app_pages.dart';
+import '../../../payment/data/models/payment_data_model.dart';
 import '../../data/models/transport_model.dart';
+import '../../trip_list/controllers/trip_list_controller.dart';
 
 class PassengerModel {
   final String seatLabel;
@@ -30,6 +35,11 @@ class PassengerInfoController extends GetxController {
   late final TripModel trip;
   late final List<Seat> seats;
   late final double totalPrice;
+
+  // Round-trip state
+  final isRoundTrip = false.obs;
+  BookingLeg? outboundLeg;
+  BookingLeg? returnLeg;
 
   final passengers = <PassengerModel>[].obs;
   final contactEmail = TextEditingController();
@@ -63,6 +73,11 @@ class PassengerInfoController extends GetxController {
       final seatsList = args['seats'] as List;
       seats = seatsList.map((s) => s as Seat).toList();
       totalPrice = args['totalPrice'] as double;
+
+      // Round-trip data
+      isRoundTrip.value = args['isRoundTrip'] as bool? ?? false;
+      outboundLeg = args['outboundLeg'] as BookingLeg?;
+      returnLeg = args['returnLeg'] as BookingLeg?;
     } else {
       // Fallback for testing
       trip = TripModel(
@@ -124,23 +139,54 @@ class PassengerInfoController extends GetxController {
     return passengers.every((p) => p.isValid);
   }
 
+  /// Get outbound trip (for round-trip, use outboundLeg; for one-way, use trip)
+  TripModel get outboundTrip => outboundLeg?.trip ?? trip;
+
+  /// Get outbound seats
+  List<Seat> get outboundSeats => outboundLeg?.seats ?? seats;
+
+  /// Get return trip (null for one-way)
+  TripModel? get returnTrip => returnLeg?.trip;
+
+  /// Get return seats (null for one-way)
+  List<Seat>? get returnSeats => returnLeg?.seats;
+
   void proceedToPayment() {
     if (!canProceed) {
-      Get.snackbar(
-        'Incomplete information',
+      AppToast.warning(
         'Please fill all passenger details and agree to terms',
-        snackPosition: SnackPosition.BOTTOM,
+        title: 'Incomplete information',
       );
       return;
     }
 
-    Get.toNamed('/transport/payment', arguments: {
-      'trip': trip,
-      'seats': seats,
-      'passengers': passengers.toList(),
-      'totalPrice': totalPrice,
-      'contactEmail': contactEmail.text,
-      'contactPhone': contactPhone.text,
-    });
+    final timeFormat = DateFormat('HH:mm');
+
+    // Create PaymentData for shared payment module
+    final paymentData = PaymentData(
+      bookingType: 'transport',
+      title: '${trip.fromCity} → ${trip.toCity}',
+      subtitle: '${trip.operatorName} · ${trip.busType}',
+      date: trip.departureTime,
+      time: timeFormat.format(trip.departureTime),
+      itemCount: seats.length,
+      itemLabel: 'seat(s)',
+      itemDetails: seats.map((s) => s.label).toList(),
+      unitPrice: trip.price,
+      totalPrice: totalPrice,
+      contactEmail: contactEmail.text,
+      contactPhone: contactPhone.text,
+      successRoute: Routes.BOOKING_CONFIRMATION,
+      successArguments: {
+        'trip': trip,
+        'seats': seats,
+        'passengers': passengers.toList(),
+        'isRoundTrip': isRoundTrip.value,
+        'outboundLeg': outboundLeg,
+        'returnLeg': returnLeg,
+      },
+    );
+
+    Get.toNamed(Routes.PAYMENT, arguments: paymentData);
   }
 }

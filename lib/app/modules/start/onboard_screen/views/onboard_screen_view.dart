@@ -39,8 +39,8 @@ class OnboardScreenView extends GetView<OnboardScreenController> {
                             children: [
                               IntroFeatureTile(
                                 icon: Icons.directions_bus_outlined,
-                                title: AppString.busTickets.tr,
-                                subtitle: AppString.busTicketsDesc.tr,
+                                title: AppString.tickets.tr,
+                                subtitle: AppString.ticketsDesc.tr,
                               ),
                               IntroFeatureTile(
                                 icon: Icons.apartment_outlined,

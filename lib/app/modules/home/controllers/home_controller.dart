@@ -59,6 +59,8 @@ class HomeController extends GetxController {
       'to': toCity.value,
       'date': departureDate.value,
       'passengers': adultCount.value,
+      'isRoundTrip': isRoundTrip.value,
+      'returnDate': isRoundTrip.value ? returnDateValue.value : null,
     });
   }
 

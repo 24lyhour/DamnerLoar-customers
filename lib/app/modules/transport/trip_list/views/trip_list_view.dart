@@ -21,6 +21,24 @@ class TripListView extends GetView<TripListController> {
         elevation: 0,
         title: Obx(() => Column(
               children: [
+                // Show leg indicator for round-trip
+                if (controller.isRoundTrip.value)
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                    margin: const EdgeInsets.only(bottom: 4),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withAlpha(30),
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: Text(
+                      controller.isSelectingReturn.value ? 'Return Trip' : 'Outbound Trip',
+                      style: AppTextStyle.caption.copyWith(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w500,
+                        fontSize: 10,
+                      ),
+                    ),
+                  ),
                 Text(
                   '${controller.fromCity.value} → ${controller.toCity.value}',
                   style: AppTextStyle.bodyMedium.copyWith(

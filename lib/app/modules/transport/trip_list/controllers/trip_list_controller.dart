@@ -1,8 +1,17 @@
 import 'package:get/get.dart';
 
+import '../../../../core/widgets/seat_layout_widget.dart';
 import '../../data/models/transport_model.dart';
 
 enum SortOption { departure, price, duration }
+
+/// Represents a leg of the booking (outbound or return)
+class BookingLeg {
+  final TripModel trip;
+  final List<Seat> seats;
+
+  BookingLeg({required this.trip, required this.seats});
+}
 
 class TripListController extends GetxController {
   // Search params from home
@@ -10,6 +19,14 @@ class TripListController extends GetxController {
   final toCity = 'Siem Reap'.obs;
   final departureDate = DateTime.now().add(const Duration(days: 1)).obs;
   final passengerCount = 2.obs;
+
+  // Round-trip state
+  final isRoundTrip = false.obs;
+  final returnDate = Rxn<DateTime>();
+  final isSelectingReturn = false.obs; // true when showing return trips
+
+  // Outbound selection (stored when moving to return leg)
+  BookingLeg? outboundLeg;
 
   // State
   final isLoading = true.obs;
@@ -32,6 +49,17 @@ class TripListController extends GetxController {
       toCity.value = args['to'] ?? toCity.value;
       departureDate.value = args['date'] ?? departureDate.value;
       passengerCount.value = args['passengers'] ?? passengerCount.value;
+      isRoundTrip.value = args['isRoundTrip'] ?? false;
+      returnDate.value = args['returnDate'];
+
+      // Check if coming back from outbound seat selection
+      if (args['outboundLeg'] != null) {
+        outboundLeg = args['outboundLeg'] as BookingLeg;
+        isSelectingReturn.value = true;
+        // Cities are already swapped in arguments from seat_selection_controller
+        // Don't swap again - just use the return date
+        departureDate.value = returnDate.value ?? departureDate.value;
+      }
     }
   }
 
@@ -151,9 +179,14 @@ class TripListController extends GetxController {
 
   void selectTrip(TripModel trip) {
     if (trip.isSoldOut) return;
+
     Get.toNamed('/transport/seat-selection', arguments: {
       'trip': trip,
       'passengers': passengerCount.value,
+      'isRoundTrip': isRoundTrip.value,
+      'returnDate': returnDate.value,
+      'isSelectingReturn': isSelectingReturn.value,
+      'outboundLeg': outboundLeg,
     });
   }
 
@@ -162,5 +195,13 @@ class TripListController extends GetxController {
     fromCity.value = toCity.value;
     toCity.value = temp;
     fetchTrips();
+  }
+
+  /// Title for app bar based on current leg
+  String get screenTitle {
+    if (isSelectingReturn.value) {
+      return 'Select Return Trip';
+    }
+    return isRoundTrip.value ? 'Select Outbound Trip' : 'Available Trips';
   }
 }

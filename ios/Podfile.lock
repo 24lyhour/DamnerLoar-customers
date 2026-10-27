@@ -1,27 +1,39 @@
 PODS:
   - Flutter (1.0.0)
+  - image_gallery_saver (2.0.2):
+    - Flutter
   - image_picker_ios (0.0.1):
     - Flutter
   - package_info_plus (0.4.5):
     - Flutter
+  - share_plus (0.0.1):
+    - Flutter
 
 DEPENDENCIES:
   - Flutter (from `Flutter`)
+  - image_gallery_saver (from `.symlinks/plugins/image_gallery_saver/ios`)
   - image_picker_ios (from `.symlinks/plugins/image_picker_ios/ios`)
   - package_info_plus (from `.symlinks/plugins/package_info_plus/ios`)
+  - share_plus (from `.symlinks/plugins/share_plus/ios`)
 
 EXTERNAL SOURCES:
   Flutter:
     :path: Flutter
+  image_gallery_saver:
+    :path: ".symlinks/plugins/image_gallery_saver/ios"
   image_picker_ios:
     :path: ".symlinks/plugins/image_picker_ios/ios"
   package_info_plus:
     :path: ".symlinks/plugins/package_info_plus/ios"
+  share_plus:
+    :path: ".symlinks/plugins/share_plus/ios"
 
 SPEC CHECKSUMS:
   Flutter: cabc95a1d2626b1b06e7179b784ebcf0c0cde467
+  image_gallery_saver: 14711d79da40581063e8842a11acf1969d781ed7
   image_picker_ios: e0ece4aa2a75771a7de3fa735d26d90817041326
   package_info_plus: af8e2ca6888548050f16fa2f1938db7b5a5df499
+  share_plus: eccd7beb7cea61271aeed1800e8ccb2b952c0c7f
 
 PODFILE CHECKSUM: 5073e328e25d3fb9f231427fb58780e45fa4d6de
 

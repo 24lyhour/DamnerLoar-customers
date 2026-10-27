@@ -20,7 +20,6 @@ abstract class Routes {
   static const PASSENGER_INFO = _Paths.TRANSPORT + _Paths.PASSENGER_INFO;
   static const SEAT_SELECTION = _Paths.TRANSPORT + _Paths.SEAT_SELECTION;
   static const TRIP_LIST = _Paths.TRANSPORT + _Paths.TRIP_LIST;
-  static const TRANSPORT_PAYMENT = _Paths.TRANSPORT + _Paths.TRANSPORT_PAYMENT;
   static const BOOKING_CONFIRMATION = _Paths.TRANSPORT + _Paths.BOOKING_CONFIRMATION;
   static const E_TICKET = _Paths.TRANSPORT + _Paths.E_TICKET;
   static const ROOM_SELECTION = _Paths.HOTEL + _Paths.ROOM_SELECTION;
@@ -49,7 +48,6 @@ abstract class _Paths {
   static const PASSENGER_INFO = '/passenger-info';
   static const SEAT_SELECTION = '/seat-selection';
   static const TRIP_LIST = '/trip-list';
-  static const TRANSPORT_PAYMENT = '/payment';
   static const BOOKING_CONFIRMATION = '/booking-confirmation';
   static const E_TICKET = '/e-ticket';
   static const ROOM_SELECTION = '/room-selection';

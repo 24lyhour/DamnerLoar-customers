@@ -2,11 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:qr_flutter/qr_flutter.dart';
+import 'package:screenshot/screenshot.dart';
 
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/theme/app_color.dart';
 import '../../../../core/theme/app_text_style.dart';
-import '../../../../core/widgets/app_button_widget.dart';
+import '../../data/models/transport_model.dart';
 import '../controllers/e_ticket_controller.dart';
 
 class ETicketView extends GetView<ETicketController> {
@@ -20,10 +21,18 @@ class ETicketView extends GetView<ETicketController> {
         backgroundColor: AppColor.primary,
         foregroundColor: Colors.white,
         elevation: 0,
-        title: const Text(
-          'E-Ticket',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
-        ),
+        title: Obx(() {
+          if (controller.isRoundTrip.value && controller.returnTrip != null) {
+            return Text(
+              controller.currentPage.value == 0 ? 'Outbound Ticket' : 'Return Ticket',
+              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+            );
+          }
+          return const Text(
+            'E-Ticket',
+            style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+          );
+        }),
         centerTitle: true,
         actions: [
           IconButton(
@@ -34,19 +43,113 @@ class ETicketView extends GetView<ETicketController> {
       ),
       body: Column(
         children: [
+          // Page indicator for round-trip
+          Obx(() {
+            if (controller.isRoundTrip.value && controller.returnTrip != null) {
+              return Padding(
+                padding: const EdgeInsets.only(top: AppSpacing.sm),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    _buildPageDot(isActive: controller.currentPage.value == 0),
+                    const SizedBox(width: 8),
+                    _buildPageDot(isActive: controller.currentPage.value == 1),
+                  ],
+                ),
+              );
+            }
+            return const SizedBox.shrink();
+          }),
+
+          // Swipeable tickets
           Expanded(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(AppSpacing.md),
-              child: _buildTicketCard(),
-            ),
+            child: Obx(() {
+              if (controller.isRoundTrip.value && controller.returnTrip != null) {
+                return PageView(
+                  controller: controller.pageController,
+                  onPageChanged: controller.onPageChanged,
+                  children: [
+                    // Outbound ticket
+                    _buildTicketPage(
+                      screenshotController: controller.outboundScreenshotController,
+                      trip: controller.outboundTrip,
+                      bookingId: controller.outboundBookingId,
+                      qrData: controller.outboundQrData,
+                      seatLabels: controller.outboundSeatLabels,
+                      seatCount: controller.outboundSeats.length,
+                    ),
+                    // Return ticket
+                    _buildTicketPage(
+                      screenshotController: controller.returnScreenshotController,
+                      trip: controller.returnTicketTrip!,
+                      bookingId: controller.returnTicketBookingId,
+                      qrData: controller.returnQrData,
+                      seatLabels: controller.returnSeatLabels,
+                      seatCount: controller.returnTicketSeats.length,
+                    ),
+                  ],
+                );
+              }
+              // One-way: single ticket
+              return _buildTicketPage(
+                screenshotController: controller.outboundScreenshotController,
+                trip: controller.outboundTrip,
+                bookingId: controller.outboundBookingId,
+                qrData: controller.outboundQrData,
+                seatLabels: controller.outboundSeatLabels,
+                seatCount: controller.outboundSeats.length,
+              );
+            }),
           ),
+
           _buildBottomActions(),
         ],
       ),
     );
   }
 
-  Widget _buildTicketCard() {
+  Widget _buildPageDot({required bool isActive}) {
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 200),
+      width: isActive ? 24 : 8,
+      height: 8,
+      decoration: BoxDecoration(
+        color: isActive ? Colors.white : Colors.white.withAlpha(100),
+        borderRadius: BorderRadius.circular(4),
+      ),
+    );
+  }
+
+  Widget _buildTicketPage({
+    required ScreenshotController screenshotController,
+    required TripModel trip,
+    required String bookingId,
+    required String qrData,
+    required String seatLabels,
+    required int seatCount,
+  }) {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(AppSpacing.md),
+      child: Screenshot(
+        controller: screenshotController,
+        child: _buildTicketCard(
+          trip: trip,
+          bookingId: bookingId,
+          qrData: qrData,
+          seatLabels: seatLabels,
+          seatCount: seatCount,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTicketCard({
+    required TripModel trip,
+    required String bookingId,
+    required String qrData,
+    required String seatLabels,
+    required int seatCount,
+  }) {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -61,31 +164,21 @@ class ETicketView extends GetView<ETicketController> {
       ),
       child: Column(
         children: [
-          // Header with QR
-          _buildQRSection(),
-
-          // Dashed divider with circles
+          _buildQRSection(bookingId: bookingId, qrData: qrData),
           _buildDashedDivider(),
-
-          // Trip details
-          _buildTripDetails(),
-
-          // Passenger & seat info
-          _buildPassengerSection(),
-
-          // Footer
+          _buildTripDetails(trip: trip),
+          _buildPassengerSection(trip: trip, seatLabels: seatLabels, seatCount: seatCount),
           _buildFooter(),
         ],
       ),
     );
   }
 
-  Widget _buildQRSection() {
+  Widget _buildQRSection({required String bookingId, required String qrData}) {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.lg),
       child: Column(
         children: [
-          // QR Code
           Container(
             padding: const EdgeInsets.all(AppSpacing.md),
             decoration: BoxDecoration(
@@ -94,7 +187,7 @@ class ETicketView extends GetView<ETicketController> {
               border: Border.all(color: AppColor.border),
             ),
             child: QrImageView(
-              data: controller.qrData,
+              data: qrData,
               version: QrVersions.auto,
               size: 160,
               eyeStyle: const QrEyeStyle(
@@ -108,10 +201,8 @@ class ETicketView extends GetView<ETicketController> {
             ),
           ),
           const SizedBox(height: AppSpacing.md),
-
-          // Booking ID
           Text(
-            controller.bookingId,
+            bookingId,
             style: AppTextStyle.subtitle.copyWith(
               fontWeight: FontWeight.bold,
               letterSpacing: 1,
@@ -120,9 +211,7 @@ class ETicketView extends GetView<ETicketController> {
           const SizedBox(height: AppSpacing.xs),
           Text(
             'Show this QR code to the driver',
-            style: AppTextStyle.caption.copyWith(
-              color: AppColor.textSecondary,
-            ),
+            style: AppTextStyle.caption.copyWith(color: AppColor.textSecondary),
           ),
         ],
       ),
@@ -132,7 +221,6 @@ class ETicketView extends GetView<ETicketController> {
   Widget _buildDashedDivider() {
     return Stack(
       children: [
-        // Dashed line
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
           child: Row(
@@ -147,7 +235,6 @@ class ETicketView extends GetView<ETicketController> {
             ),
           ),
         ),
-        // Left circle cutout
         Positioned(
           left: -12,
           top: -12,
@@ -160,7 +247,6 @@ class ETicketView extends GetView<ETicketController> {
             ),
           ),
         ),
-        // Right circle cutout
         Positioned(
           right: -12,
           top: -12,
@@ -177,7 +263,7 @@ class ETicketView extends GetView<ETicketController> {
     );
   }
 
-  Widget _buildTripDetails() {
+  Widget _buildTripDetails({required TripModel trip}) {
     final dateFormat = DateFormat('EEE, d MMM yyyy');
     final timeFormat = DateFormat('HH:mm');
 
@@ -185,7 +271,6 @@ class ETicketView extends GetView<ETicketController> {
       padding: const EdgeInsets.all(AppSpacing.lg),
       child: Column(
         children: [
-          // Route
           Row(
             children: [
               Expanded(
@@ -193,35 +278,27 @@ class ETicketView extends GetView<ETicketController> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      timeFormat.format(controller.trip.departureTime),
-                      style: AppTextStyle.headline.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
+                      timeFormat.format(trip.departureTime),
+                      style: AppTextStyle.headline.copyWith(fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      controller.trip.fromCity,
-                      style: AppTextStyle.bodySmall.copyWith(
-                        color: AppColor.textSecondary,
-                      ),
+                      trip.fromCity,
+                      style: AppTextStyle.bodySmall.copyWith(color: AppColor.textSecondary),
                     ),
                   ],
                 ),
               ),
-              // Journey indicator
               Column(
                 children: [
                   Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: AppSpacing.sm,
-                      vertical: 2,
-                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: 2),
                     decoration: BoxDecoration(
                       color: AppColor.primary.withAlpha(20),
                       borderRadius: BorderRadius.circular(4),
                     ),
                     child: Text(
-                      controller.trip.durationText,
+                      trip.durationText,
                       style: AppTextStyle.caption.copyWith(
                         color: AppColor.primary,
                         fontWeight: FontWeight.w500,
@@ -240,21 +317,9 @@ class ETicketView extends GetView<ETicketController> {
                           border: Border.all(color: Colors.white, width: 2),
                         ),
                       ),
-                      Container(
-                        width: 40,
-                        height: 2,
-                        color: AppColor.primary,
-                      ),
-                      const Icon(
-                        Icons.directions_bus,
-                        size: 16,
-                        color: AppColor.primary,
-                      ),
-                      Container(
-                        width: 40,
-                        height: 2,
-                        color: AppColor.primary,
-                      ),
+                      Container(width: 40, height: 2, color: AppColor.primary),
+                      const Icon(Icons.directions_bus, size: 16, color: AppColor.primary),
+                      Container(width: 40, height: 2, color: AppColor.primary),
                       Container(
                         width: 8,
                         height: 8,
@@ -272,17 +337,13 @@ class ETicketView extends GetView<ETicketController> {
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     Text(
-                      timeFormat.format(controller.trip.arrivalTime),
-                      style: AppTextStyle.headline.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
+                      timeFormat.format(trip.arrivalTime),
+                      style: AppTextStyle.headline.copyWith(fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      controller.trip.toCity,
-                      style: AppTextStyle.bodySmall.copyWith(
-                        color: AppColor.textSecondary,
-                      ),
+                      trip.toCity,
+                      style: AppTextStyle.bodySmall.copyWith(color: AppColor.textSecondary),
                     ),
                   ],
                 ),
@@ -290,13 +351,8 @@ class ETicketView extends GetView<ETicketController> {
             ],
           ),
           const SizedBox(height: AppSpacing.md),
-
-          // Date
           Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.md,
-              vertical: AppSpacing.sm,
-            ),
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
             decoration: BoxDecoration(
               color: AppColor.surface,
               borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
@@ -304,17 +360,11 @@ class ETicketView extends GetView<ETicketController> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Icon(
-                  Icons.calendar_today,
-                  size: 16,
-                  color: AppColor.primary,
-                ),
+                const Icon(Icons.calendar_today, size: 16, color: AppColor.primary),
                 const SizedBox(width: AppSpacing.sm),
                 Text(
-                  dateFormat.format(controller.trip.departureTime),
-                  style: AppTextStyle.bodyMedium.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
+                  dateFormat.format(trip.departureTime),
+                  style: AppTextStyle.bodyMedium.copyWith(fontWeight: FontWeight.w600),
                 ),
               ],
             ),
@@ -324,7 +374,11 @@ class ETicketView extends GetView<ETicketController> {
     );
   }
 
-  Widget _buildPassengerSection() {
+  Widget _buildPassengerSection({
+    required TripModel trip,
+    required String seatLabels,
+    required int seatCount,
+  }) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
       padding: const EdgeInsets.all(AppSpacing.md),
@@ -334,13 +388,13 @@ class ETicketView extends GetView<ETicketController> {
       ),
       child: Column(
         children: [
-          _buildInfoRow('Operator', controller.trip.operatorName),
+          _buildInfoRow('Operator', trip.operatorName),
           const Divider(height: AppSpacing.md),
-          _buildInfoRow('Bus Type', controller.trip.busType),
+          _buildInfoRow('Bus Type', trip.busType),
           const Divider(height: AppSpacing.md),
-          _buildInfoRow('Seat(s)', controller.seatLabels),
+          _buildInfoRow('Seat(s)', seatLabels),
           const Divider(height: AppSpacing.md),
-          _buildInfoRow('Passengers', '${controller.seats.length} person(s)'),
+          _buildInfoRow('Passengers', '$seatCount person(s)'),
         ],
       ),
     );
@@ -350,18 +404,8 @@ class ETicketView extends GetView<ETicketController> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(
-          label,
-          style: AppTextStyle.bodySmall.copyWith(
-            color: AppColor.textSecondary,
-          ),
-        ),
-        Text(
-          value,
-          style: AppTextStyle.bodySmall.copyWith(
-            fontWeight: FontWeight.w600,
-          ),
-        ),
+        Text(label, style: AppTextStyle.bodySmall.copyWith(color: AppColor.textSecondary)),
+        Text(value, style: AppTextStyle.bodySmall.copyWith(fontWeight: FontWeight.w600)),
       ],
     );
   }
@@ -369,24 +413,14 @@ class ETicketView extends GetView<ETicketController> {
   Widget _buildFooter() {
     return Padding(
       padding: const EdgeInsets.all(AppSpacing.lg),
-      child: Column(
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(
-                Icons.info_outline,
-                size: 14,
-                color: AppColor.textSecondary,
-              ),
-              const SizedBox(width: AppSpacing.xs),
-              Text(
-                'Please arrive 15 minutes before departure',
-                style: AppTextStyle.caption.copyWith(
-                  color: AppColor.textSecondary,
-                ),
-              ),
-            ],
+          const Icon(Icons.info_outline, size: 14, color: AppColor.textSecondary),
+          const SizedBox(width: AppSpacing.xs),
+          Text(
+            'Please arrive 15 minutes before departure',
+            style: AppTextStyle.caption.copyWith(color: AppColor.textSecondary),
           ),
         ],
       ),
@@ -401,39 +435,74 @@ class ETicketView extends GetView<ETicketController> {
         AppSpacing.md,
         AppSpacing.md + MediaQuery.of(Get.context!).padding.bottom,
       ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
+      child: Row(
         children: [
-          // Download & Share row
-          Row(
-            children: [
-              Expanded(
-                child: AppButton(
-                  label: 'Download',
-                  icon: Icons.download,
-                  onPressed: controller.downloadTicket,
-                  variant: AppButtonVariant.secondary,
-                ),
-              ),
-              const SizedBox(width: AppSpacing.sm),
-              Expanded(
-                child: AppButton(
-                  label: 'Share',
-                  icon: Icons.share,
-                  onPressed: controller.shareTicket,
-                  variant: AppButtonVariant.secondary,
-                ),
-              ),
-            ],
+          Expanded(
+            child: _buildWhiteOutlinedButton(
+              label: 'Download',
+              icon: Icons.download,
+              onPressed: controller.downloadTicket,
+            ),
           ),
-          const SizedBox(height: AppSpacing.sm),
-          // Back to Home button
-          AppButton(
-            label: 'Back to Home',
-            onPressed: () => Get.offAllNamed('/home'),
-            isExpanded: true,
+          const SizedBox(width: AppSpacing.sm),
+          Expanded(
+            child: _buildWhiteFilledButton(
+              label: 'Back to Home',
+              onPressed: controller.goToHome,
+            ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildWhiteOutlinedButton({
+    required String label,
+    required IconData icon,
+    required VoidCallback onPressed,
+  }) {
+    return GestureDetector(
+      onTap: onPressed,
+      child: Container(
+        height: 48,
+        decoration: BoxDecoration(
+          color: Colors.transparent,
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(color: Colors.white, width: 1.5),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icon, size: 20, color: Colors.white),
+            const SizedBox(width: 8),
+            Text(
+              label,
+              style: AppTextStyle.button.copyWith(color: Colors.white, fontWeight: FontWeight.w600),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildWhiteFilledButton({
+    required String label,
+    required VoidCallback onPressed,
+  }) {
+    return GestureDetector(
+      onTap: onPressed,
+      child: Container(
+        height: 48,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Center(
+          child: Text(
+            label,
+            style: AppTextStyle.button.copyWith(color: AppColor.primary, fontWeight: FontWeight.w600),
+          ),
+        ),
       ),
     );
   }

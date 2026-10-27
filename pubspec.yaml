@@ -44,6 +44,9 @@ dependencies:
   skeletonizer: ^3.0.0
   intl_phone_number_input: ^0.7.4
   qr_flutter: ^4.1.0
+  share_plus: ^13.3.1
+  screenshot: ^3.0.0
+  image_gallery_saver: ^2.0.3
 
 dev_dependencies:
   flutter_test:

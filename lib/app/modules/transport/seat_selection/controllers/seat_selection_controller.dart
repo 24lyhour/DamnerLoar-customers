@@ -1,12 +1,21 @@
 import 'package:get/get.dart';
 
+import '../../../../core/helpers/toast_helper.dart';
 import '../../../../core/widgets/seat_layout_widget.dart';
+import '../../../../routes/app_pages.dart';
 import '../../data/models/transport_model.dart';
+import '../../trip_list/controllers/trip_list_controller.dart';
 
 class SeatSelectionController extends GetxController {
   // Trip info - with safe defaults
   final Rx<TripModel?> _trip = Rx<TripModel?>(null);
   final passengerCount = 1.obs;
+
+  // Round-trip state
+  final isRoundTrip = false.obs;
+  final Rxn<DateTime> returnDate = Rxn<DateTime>();
+  final isSelectingReturn = false.obs;
+  BookingLeg? outboundLeg;
 
   TripModel get trip => _trip.value ?? _defaultTrip;
 
@@ -46,6 +55,10 @@ class SeatSelectionController extends GetxController {
       if (args != null) {
         _trip.value = args['trip'] as TripModel?;
         passengerCount.value = args['passengers'] as int? ?? 1;
+        isRoundTrip.value = args['isRoundTrip'] as bool? ?? false;
+        returnDate.value = args['returnDate'] as DateTime?;
+        isSelectingReturn.value = args['isSelectingReturn'] as bool? ?? false;
+        outboundLeg = args['outboundLeg'] as BookingLeg?;
       }
     } catch (e) {
       print('Error loading arguments: $e');
@@ -82,10 +95,9 @@ class SeatSelectionController extends GetxController {
     } else {
       // Check max selection
       if (selectedSeatIds.length >= passengerCount.value) {
-        Get.snackbar(
-          'Maximum seats reached',
+        AppToast.warning(
           'You can only select ${passengerCount.value} seat(s)',
-          snackPosition: SnackPosition.BOTTOM,
+          title: 'Maximum seats reached',
         );
         return;
       }
@@ -107,20 +119,70 @@ class SeatSelectionController extends GetxController {
 
   bool get canProceed => selectedSeatIds.length == passengerCount.value;
 
+  /// Screen title based on round-trip state
+  String get screenTitle {
+    if (isSelectingReturn.value) {
+      return 'Return Seats';
+    }
+    return isRoundTrip.value ? 'Outbound Seats' : 'Select Seats';
+  }
+
   void proceedToPassengerInfo() {
     if (!canProceed) {
-      Get.snackbar(
-        'Select seats',
+      AppToast.info(
         'Please select ${passengerCount.value} seat(s) to continue',
-        snackPosition: SnackPosition.BOTTOM,
+        title: 'Select seats',
       );
       return;
     }
 
-    Get.toNamed('/transport/passenger-info', arguments: {
+    // If round-trip and selecting outbound, go to return trip list
+    if (isRoundTrip.value && !isSelectingReturn.value) {
+      final currentLeg = BookingLeg(trip: trip, seats: selectedSeats);
+
+      // Delete old TripListController to force recreation with new arguments
+      Get.delete<TripListController>(force: true);
+
+      // Navigate to return trip list
+      Get.offNamed(Routes.TRIP_LIST, arguments: {
+        'from': trip.toCity, // Swap for return
+        'to': trip.fromCity,
+        'date': returnDate.value,
+        'passengers': passengerCount.value,
+        'isRoundTrip': true,
+        'returnDate': returnDate.value,
+        'outboundLeg': currentLeg, // Pass outbound selection
+      });
+      return;
+    }
+
+    // If selecting return, combine both legs
+    if (isSelectingReturn.value && outboundLeg != null) {
+      final returnLeg = BookingLeg(trip: trip, seats: selectedSeats);
+
+      Get.toNamed(Routes.PASSENGER_INFO, arguments: {
+        'trip': outboundLeg!.trip, // Primary trip is outbound
+        'seats': outboundLeg!.seats,
+        'totalPrice': _calculateTotalPrice(outboundLeg!, returnLeg),
+        'isRoundTrip': true,
+        'outboundLeg': outboundLeg,
+        'returnLeg': returnLeg,
+      });
+      return;
+    }
+
+    // One-way: go directly to passenger info
+    Get.toNamed(Routes.PASSENGER_INFO, arguments: {
       'trip': trip,
       'seats': selectedSeats,
       'totalPrice': totalPrice,
+      'isRoundTrip': false,
     });
+  }
+
+  double _calculateTotalPrice(BookingLeg outbound, BookingLeg returnLeg) {
+    final outboundTotal = outbound.seats.length * outbound.trip.price;
+    final returnTotal = returnLeg.seats.length * returnLeg.trip.price;
+    return outboundTotal + returnTotal;
   }
 }

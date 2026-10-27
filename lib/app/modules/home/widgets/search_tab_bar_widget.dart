@@ -22,7 +22,7 @@ class SearchTabBar extends GetView<HomeController> {
             children: [
               _buildTab(
                 icon: Icons.directions_bus_outlined,
-                label: AppString.busTickets.tr,
+                label: AppString.tickets.tr,
                 tab: SearchTab.transport,
               ),
               _buildTab(
@@ -31,7 +31,7 @@ class SearchTabBar extends GetView<HomeController> {
                 tab: SearchTab.hotel,
               ),
               _buildTab(
-                icon: Icons.card_travel_outlined,
+                icon: Icons.local_offer_outlined,
                 label: AppString.transportHotel.tr,
                 tab: SearchTab.package,
               ),
