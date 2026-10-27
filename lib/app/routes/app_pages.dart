@@ -40,10 +40,16 @@ import '../modules/start/splash_screen/bindings/splash_screen_binding.dart';
 import '../modules/start/splash_screen/views/splash_screen_view.dart';
 import '../modules/start/views/start_view.dart';
 import '../modules/transport/bindings/transport_binding.dart';
+import '../modules/transport/booking_confirmation/bindings/booking_confirmation_binding.dart';
+import '../modules/transport/booking_confirmation/views/booking_confirmation_view.dart';
 import '../modules/transport/passenger_info/bindings/passenger_info_binding.dart';
 import '../modules/transport/passenger_info/views/passenger_info_view.dart';
 import '../modules/transport/seat_selection/bindings/seat_selection_binding.dart';
 import '../modules/transport/seat_selection/views/seat_selection_view.dart';
+import '../modules/transport/payment/bindings/payment_binding.dart'
+    as transport_payment;
+import '../modules/transport/payment/views/payment_view.dart'
+    as transport_payment;
 import '../modules/transport/trip_list/bindings/trip_list_binding.dart';
 import '../modules/transport/trip_list/views/trip_list_view.dart';
 import '../modules/transport/views/transport_view.dart';
@@ -83,6 +89,16 @@ class AppPages {
           name: _Paths.TRIP_LIST,
           page: () => const TripListView(),
           binding: TripListBinding(),
+        ),
+        GetPage(
+          name: _Paths.TRANSPORT_PAYMENT,
+          page: () => const transport_payment.PaymentView(),
+          binding: transport_payment.PaymentBinding(),
+        ),
+        GetPage(
+          name: _Paths.BOOKING_CONFIRMATION,
+          page: () => const BookingConfirmationView(),
+          binding: BookingConfirmationBinding(),
         ),
       ],
     ),

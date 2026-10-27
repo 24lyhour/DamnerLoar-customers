@@ -17,9 +17,10 @@ class _HomeBannerSliderState extends State<HomeBannerSlider> {
   Timer? _autoScrollTimer;
   int _currentPage = 0;
 
-  // Banner images - add more as needed
+  // Banner images
   static const List<String> _bannerImages = [
     'assets/images/banners/home_banner.png',
+    'assets/images/banners/home_banner_2.png',
   ];
 
   // Duplicate for infinite scroll effect
@@ -45,7 +46,7 @@ class _HomeBannerSliderState extends State<HomeBannerSlider> {
     _autoScrollTimer = Timer.periodic(const Duration(seconds: 5), (_) {
       if (!mounted) return;
 
-      final nextPage = _currentPage + 1;
+      final nextPage = (_currentPage + 1) % _bannerImages.length;
       _pageController.animateToPage(
         nextPage,
         duration: const Duration(milliseconds: 800),

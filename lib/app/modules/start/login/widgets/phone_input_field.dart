@@ -1,20 +1,22 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/theme/app_color.dart';
 import '../../../../core/theme/app_text_style.dart';
 
-/// Phone input with Cambodia +855 prefix and flag.
+/// Phone input with country code picker using intl_phone_number_input package.
 class PhoneInputField extends StatelessWidget {
   const PhoneInputField({
     super.key,
     required this.controller,
     this.onChanged,
+    this.onInputValidated,
   });
 
   final TextEditingController controller;
   final ValueChanged<String>? onChanged;
+  final ValueChanged<bool>? onInputValidated;
 
   @override
   Widget build(BuildContext context) {
@@ -23,116 +25,43 @@ class PhoneInputField extends StatelessWidget {
         border: Border.all(color: AppColor.border),
         borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
       ),
-      child: Row(
-        children: [
-          // Country code selector (fixed to Cambodia for now)
-          Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.md,
-              vertical: AppSpacing.md,
-            ),
-            decoration: BoxDecoration(
-              border: Border(
-                right: BorderSide(color: AppColor.border),
-              ),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // Cambodia flag
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(2),
-                  child: Image.asset(
-                    'assets/images/flags/kh.png',
-                    width: 24,
-                    height: 16,
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) => Container(
-                      width: 24,
-                      height: 16,
-                      decoration: BoxDecoration(
-                        color: AppColor.primary,
-                        borderRadius: BorderRadius.circular(2),
-                      ),
-                      child: const Center(
-                        child: Text(
-                          '🇰🇭',
-                          style: TextStyle(fontSize: 12),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: AppSpacing.xs),
-                Text(
-                  '+855',
-                  style: AppTextStyle.bodyMedium.copyWith(
-                    color: AppColor.textPrimary,
-                  ),
-                ),
-                const SizedBox(width: AppSpacing.xxs),
-                Icon(
-                  Icons.keyboard_arrow_down,
-                  size: 20,
-                  color: AppColor.textSecondary,
-                ),
-              ],
-            ),
+      child: InternationalPhoneNumberInput(
+        onInputChanged: (PhoneNumber number) {
+          onChanged?.call(number.phoneNumber ?? '');
+        },
+        onInputValidated: onInputValidated,
+        selectorConfig: const SelectorConfig(
+          selectorType: PhoneInputSelectorType.BOTTOM_SHEET,
+          useBottomSheetSafeArea: true,
+          leadingPadding: 12,
+          trailingSpace: false,
+          setSelectorButtonAsPrefixIcon: true,
+        ),
+        ignoreBlank: false,
+        autoValidateMode: AutovalidateMode.disabled,
+        selectorTextStyle: AppTextStyle.bodyMedium.copyWith(
+          color: AppColor.textPrimary,
+        ),
+        textFieldController: controller,
+        formatInput: true,
+        keyboardType: TextInputType.phone,
+        inputDecoration: InputDecoration(
+          hintText: '12 345 678',
+          hintStyle: AppTextStyle.bodyMedium.copyWith(
+            color: AppColor.textTertiary,
           ),
-          // Phone number input
-          Expanded(
-            child: TextField(
-              controller: controller,
-              onChanged: onChanged,
-              keyboardType: TextInputType.phone,
-              inputFormatters: [
-                FilteringTextInputFormatter.digitsOnly,
-                LengthLimitingTextInputFormatter(9),
-                _PhoneNumberFormatter(),
-              ],
-              style: AppTextStyle.bodyMedium.copyWith(
-                color: AppColor.textPrimary,
-              ),
-              decoration: InputDecoration(
-                hintText: '12 345 678',
-                hintStyle: AppTextStyle.bodyMedium.copyWith(
-                  color: AppColor.textTertiary,
-                ),
-                border: InputBorder.none,
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.md,
-                  vertical: AppSpacing.md,
-                ),
-              ),
-            ),
+          border: InputBorder.none,
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.md,
+            vertical: AppSpacing.md,
           ),
-        ],
+        ),
+        textStyle: AppTextStyle.bodyMedium.copyWith(
+          color: AppColor.textPrimary,
+        ),
+        initialValue: PhoneNumber(isoCode: 'KH'), // Cambodia default
+        countries: const ['KH', 'TH', 'VN', 'LA', 'MM', 'MY', 'SG', 'US'],
       ),
-    );
-  }
-}
-
-/// Formats phone number as "12 345 678".
-class _PhoneNumberFormatter extends TextInputFormatter {
-  @override
-  TextEditingValue formatEditUpdate(
-    TextEditingValue oldValue,
-    TextEditingValue newValue,
-  ) {
-    final digits = newValue.text.replaceAll(' ', '');
-    final buffer = StringBuffer();
-
-    for (var i = 0; i < digits.length; i++) {
-      if (i == 2 || i == 5) {
-        buffer.write(' ');
-      }
-      buffer.write(digits[i]);
-    }
-
-    final formatted = buffer.toString();
-    return TextEditingValue(
-      text: formatted,
-      selection: TextSelection.collapsed(offset: formatted.length),
     );
   }
 }

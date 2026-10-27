@@ -1,5 +1,7 @@
 import 'package:get/get.dart';
 
+import '../../../routes/app_pages.dart';
+
 enum SearchTab { transport, hotel, package }
 
 class HomeController extends GetxController {
@@ -11,7 +13,7 @@ class HomeController extends GetxController {
   final isTabLoading = false.obs;
 
   // Transport form
-  final isRoundTrip = false.obs;
+  final isRoundTrip = true.obs;
   final fromCity = 'Phnom Penh'.obs;
   final toCity = 'Siem Reap'.obs;
   final departureDate = DateTime.now().add(const Duration(days: 1)).obs;
@@ -52,8 +54,12 @@ class HomeController extends GetxController {
   }
 
   void searchBuses() {
-    // TODO: Navigate to transport results
-    Get.toNamed('/transport');
+    Get.toNamed(Routes.TRIP_LIST, arguments: {
+      'from': fromCity.value,
+      'to': toCity.value,
+      'date': departureDate.value,
+      'passengers': adultCount.value,
+    });
   }
 
   void searchHotels() {

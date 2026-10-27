@@ -13,7 +13,8 @@ import 'app/routes/app_pages.dart';
 Future<void> bootstrap(AppFlavor flavor) async {
   WidgetsFlutterBinding.ensureInitialized();
   AppConfig.init(flavor);
-  await Get.putAsync(() => StorageService().init(), permanent: true);
+  final isDev = flavor == AppFlavor.dev;
+  await Get.putAsync(() => StorageService().init(seedDevData: isDev), permanent: true);
 
   runApp(
     FlavorBanner(

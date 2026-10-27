@@ -100,7 +100,7 @@ class OtpVerificationController extends GetxController {
     isLoading.value = false;
 
     if (isValid) {
-      Get.offAllNamed(Routes.COMPLETE_PROFILE);
+      Get.offAllNamed(Routes.COMPLETE_PROFILE, arguments: {'phone': phone.value});
     } else {
       errorMessage.value = 'Invalid code. Please try again.';
       // Clear OTP fields
