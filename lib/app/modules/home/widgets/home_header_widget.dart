@@ -21,22 +21,33 @@ class HomeHeader extends StatelessWidget {
           // Logo
           Row(
             children: [
-              ClipRRect(
-                borderRadius: BorderRadius.circular(8),
-                child: Image.asset(
-                  'assets/images/logo/logo.png',
-                  width: 36,
-                  height: 36,
-                  fit: BoxFit.contain,
-                  errorBuilder: (_, __, ___) => Container(
-                    width: 36,
-                    height: 36,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(8),
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(10),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withAlpha(20),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
                     ),
-                    child: const Center(
-                      child: Text('🚌', style: TextStyle(fontSize: 20)),
+                  ],
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(10),
+                  child: Image.asset(
+                    'assets/images/logo/logo.png',
+                    width: 40,
+                    height: 40,
+                    fit: BoxFit.cover,
+                    errorBuilder: (_, __, ___) => const Center(
+                      child: Icon(
+                        Icons.directions_bus_rounded,
+                        color: Color(0xFF174A8B),
+                        size: 24,
+                      ),
                     ),
                   ),
                 ),

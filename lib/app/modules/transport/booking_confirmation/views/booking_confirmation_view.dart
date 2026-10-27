@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../core/constants/app_spacing.dart';
+import '../../../../core/helpers/toast_helper.dart';
 import '../../../../core/theme/app_color.dart';
 import '../../../../core/theme/app_text_style.dart';
 import '../../../../core/widgets/app_button_widget.dart';
@@ -16,42 +18,31 @@ class BookingConfirmationView extends GetView<BookingConfirmationController> {
     return Scaffold(
       backgroundColor: AppColor.surface,
       body: SafeArea(
+        bottom: false,
         child: Column(
           children: [
             Expanded(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.all(AppSpacing.lg),
+                padding: const EdgeInsets.all(AppSpacing.md),
                 child: Column(
                   children: [
                     const SizedBox(height: AppSpacing.xl),
 
-                    // Success icon
-                    Container(
-                      width: 100,
-                      height: 100,
-                      decoration: BoxDecoration(
-                        color: AppColor.success.withAlpha(30),
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(
-                        Icons.check_circle,
-                        size: 60,
-                        color: AppColor.success,
-                      ),
-                    ),
+                    // Success icon with animation feel
+                    _buildSuccessIcon(),
                     const SizedBox(height: AppSpacing.lg),
 
                     // Success message
                     Text(
                       'Booking Confirmed!',
-                      style: AppTextStyle.headline.copyWith(
+                      style: AppTextStyle.title.copyWith(
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                     const SizedBox(height: AppSpacing.xs),
                     Text(
                       'Your ticket has been booked successfully',
-                      style: AppTextStyle.bodyMedium.copyWith(
+                      style: AppTextStyle.bodySmall.copyWith(
                         color: AppColor.textSecondary,
                       ),
                     ),
@@ -63,14 +54,41 @@ class BookingConfirmationView extends GetView<BookingConfirmationController> {
 
                     // Trip summary
                     _buildTripSummary(),
+                    const SizedBox(height: AppSpacing.md),
                   ],
                 ),
               ),
             ),
 
-            // Bottom actions
-            _buildBottomActions(),
+            // Bottom actions - clean 2 button layout
+            _buildCleanBottomBar(),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSuccessIcon() {
+    return Container(
+      width: 88,
+      height: 88,
+      decoration: BoxDecoration(
+        color: AppColor.success.withAlpha(25),
+        shape: BoxShape.circle,
+      ),
+      child: Center(
+        child: Container(
+          width: 64,
+          height: 64,
+          decoration: const BoxDecoration(
+            color: AppColor.success,
+            shape: BoxShape.circle,
+          ),
+          child: const Icon(
+            Icons.check_rounded,
+            size: 40,
+            color: Colors.white,
+          ),
         ),
       ),
     );
@@ -78,7 +96,7 @@ class BookingConfirmationView extends GetView<BookingConfirmationController> {
 
   Widget _buildBookingCard() {
     return Container(
-      padding: const EdgeInsets.all(AppSpacing.lg),
+      padding: const EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
@@ -86,117 +104,83 @@ class BookingConfirmationView extends GetView<BookingConfirmationController> {
       ),
       child: Column(
         children: [
-          // Booking ID
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Booking ID',
-                style: AppTextStyle.bodySmall.copyWith(
-                  color: AppColor.textSecondary,
-                ),
-              ),
-              Row(
-                children: [
-                  Text(
-                    controller.bookingId,
-                    style: AppTextStyle.bodyMedium.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: AppColor.primary,
-                    ),
+          // Booking ID row
+          _buildInfoRow(
+            label: 'Booking ID',
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  controller.bookingId,
+                  style: AppTextStyle.bodySmall.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: AppColor.primary,
                   ),
-                  const SizedBox(width: AppSpacing.xs),
-                  GestureDetector(
-                    onTap: () {
-                      // Copy to clipboard
-                      Get.snackbar(
-                        'Copied',
-                        'Booking ID copied to clipboard',
-                        snackPosition: SnackPosition.BOTTOM,
-                        duration: const Duration(seconds: 2),
-                      );
-                    },
+                ),
+                const SizedBox(width: AppSpacing.xs),
+                GestureDetector(
+                  onTap: () {
+                    Clipboard.setData(ClipboardData(text: controller.bookingId));
+                    AppToast.copied('Booking ID copied');
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                      color: AppColor.surface,
+                      borderRadius: BorderRadius.circular(4),
+                    ),
                     child: const Icon(
-                      Icons.copy,
-                      size: 18,
+                      Icons.copy_outlined,
+                      size: 16,
                       color: AppColor.textSecondary,
                     ),
                   ),
-                ],
-              ),
-            ],
+                ),
+              ],
+            ),
           ),
           const Divider(height: AppSpacing.lg),
 
-          // Status
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Status',
-                style: AppTextStyle.bodySmall.copyWith(
-                  color: AppColor.textSecondary,
+          // Status row
+          _buildInfoRow(
+            label: 'Status',
+            child: Container(
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.sm,
+                vertical: 4,
+              ),
+              decoration: BoxDecoration(
+                color: AppColor.success.withAlpha(20),
+                borderRadius: BorderRadius.circular(4),
+              ),
+              child: Text(
+                'Confirmed',
+                style: AppTextStyle.caption.copyWith(
+                  color: AppColor.success,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.sm,
-                  vertical: AppSpacing.xs,
-                ),
-                decoration: BoxDecoration(
-                  color: AppColor.success.withAlpha(30),
-                  borderRadius: BorderRadius.circular(4),
-                ),
-                child: Text(
-                  'Confirmed',
-                  style: AppTextStyle.caption.copyWith(
-                    color: AppColor.success,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-            ],
+            ),
           ),
           const SizedBox(height: AppSpacing.sm),
 
           // Payment method
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Payment',
-                style: AppTextStyle.bodySmall.copyWith(
-                  color: AppColor.textSecondary,
-                ),
-              ),
-              Text(
-                controller.paymentMethod,
-                style: AppTextStyle.bodySmall.copyWith(
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ],
+          _buildInfoRow(
+            label: 'Payment',
+            value: controller.paymentMethod,
           ),
           const SizedBox(height: AppSpacing.sm),
 
           // Total paid
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Total Paid',
-                style: AppTextStyle.bodySmall.copyWith(
-                  color: AppColor.textSecondary,
-                ),
+          _buildInfoRow(
+            label: 'Total Paid',
+            child: Text(
+              '\$${controller.totalPaid.toStringAsFixed(2)}',
+              style: AppTextStyle.bodyMedium.copyWith(
+                fontWeight: FontWeight.bold,
+                color: AppColor.primary,
               ),
-              Text(
-                '\$${controller.totalPaid.toStringAsFixed(2)}',
-                style: AppTextStyle.bodyMedium.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: AppColor.primary,
-                ),
-              ),
-            ],
+            ),
           ),
         ],
       ),
@@ -217,22 +201,20 @@ class BookingConfirmationView extends GetView<BookingConfirmationController> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Operator
+          // Operator header
           Row(
             children: [
               Container(
                 width: 40,
                 height: 40,
                 decoration: BoxDecoration(
-                  color: AppColor.primary.withAlpha(25),
+                  color: AppColor.primary.withAlpha(20),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: const Center(
-                  child: Icon(
-                    Icons.directions_bus,
-                    color: AppColor.primary,
-                    size: 20,
-                  ),
+                child: const Icon(
+                  Icons.directions_bus_rounded,
+                  color: AppColor.primary,
+                  size: 22,
                 ),
               ),
               const SizedBox(width: AppSpacing.sm),
@@ -259,9 +241,10 @@ class BookingConfirmationView extends GetView<BookingConfirmationController> {
           ),
           const Divider(height: AppSpacing.lg),
 
-          // Route and time
+          // Route timeline
           Row(
             children: [
+              // Departure
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -272,6 +255,7 @@ class BookingConfirmationView extends GetView<BookingConfirmationController> {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
+                    const SizedBox(height: 2),
                     Text(
                       controller.trip.fromCity,
                       style: AppTextStyle.caption.copyWith(
@@ -281,21 +265,40 @@ class BookingConfirmationView extends GetView<BookingConfirmationController> {
                   ],
                 ),
               ),
-              Column(
-                children: [
-                  Text(
-                    controller.trip.durationText,
-                    style: AppTextStyle.caption.copyWith(
-                      color: AppColor.textSecondary,
+
+              // Duration indicator
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
+                child: Column(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 6,
+                        vertical: 2,
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppColor.surface,
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: Text(
+                        controller.trip.durationText,
+                        style: AppTextStyle.caption.copyWith(
+                          color: AppColor.textSecondary,
+                          fontSize: 10,
+                        ),
+                      ),
                     ),
-                  ),
-                  const Icon(
-                    Icons.arrow_forward,
-                    size: 16,
-                    color: AppColor.textSecondary,
-                  ),
-                ],
+                    const SizedBox(height: 4),
+                    const Icon(
+                      Icons.arrow_forward,
+                      size: 14,
+                      color: AppColor.textTertiary,
+                    ),
+                  ],
+                ),
               ),
+
+              // Arrival
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
@@ -306,6 +309,7 @@ class BookingConfirmationView extends GetView<BookingConfirmationController> {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
+                    const SizedBox(height: 2),
                     Text(
                       controller.trip.toCity,
                       style: AppTextStyle.caption.copyWith(
@@ -325,25 +329,35 @@ class BookingConfirmationView extends GetView<BookingConfirmationController> {
             children: [
               Row(
                 children: [
-                  const Icon(
-                    Icons.calendar_today,
-                    size: 16,
-                    color: AppColor.textSecondary,
+                  Icon(
+                    Icons.calendar_today_outlined,
+                    size: 14,
+                    color: AppColor.textSecondary.withAlpha(180),
                   ),
                   const SizedBox(width: AppSpacing.xs),
                   Text(
                     dateFormat.format(controller.trip.departureTime),
-                    style: AppTextStyle.bodySmall.copyWith(
+                    style: AppTextStyle.caption.copyWith(
                       color: AppColor.textSecondary,
                     ),
                   ),
                 ],
               ),
-              Text(
-                'Seats: ${controller.seats.map((s) => s.label).join(", ")}',
-                style: AppTextStyle.bodySmall.copyWith(
-                  color: AppColor.primary,
-                  fontWeight: FontWeight.w500,
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.sm,
+                  vertical: 4,
+                ),
+                decoration: BoxDecoration(
+                  color: AppColor.primary.withAlpha(15),
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: Text(
+                  'Seats: ${controller.seats.map((s) => s.label).join(", ")}',
+                  style: AppTextStyle.caption.copyWith(
+                    color: AppColor.primary,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
             ],
@@ -353,7 +367,32 @@ class BookingConfirmationView extends GetView<BookingConfirmationController> {
     );
   }
 
-  Widget _buildBottomActions() {
+  Widget _buildInfoRow({
+    required String label,
+    String? value,
+    Widget? child,
+  }) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          label,
+          style: AppTextStyle.bodySmall.copyWith(
+            color: AppColor.textSecondary,
+          ),
+        ),
+        child ??
+            Text(
+              value ?? '',
+              style: AppTextStyle.bodySmall.copyWith(
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+      ],
+    );
+  }
+
+  Widget _buildCleanBottomBar() {
     return Container(
       padding: EdgeInsets.fromLTRB(
         AppSpacing.md,
@@ -365,8 +404,8 @@ class BookingConfirmationView extends GetView<BookingConfirmationController> {
         color: Colors.white,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withAlpha(10),
-            blurRadius: 10,
+            color: Colors.black.withAlpha(8),
+            blurRadius: 8,
             offset: const Offset(0, -2),
           ),
         ],
@@ -374,19 +413,13 @@ class BookingConfirmationView extends GetView<BookingConfirmationController> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          AppButton(
-            label: 'View E-Ticket',
-            onPressed: controller.viewETicket,
-            isExpanded: true,
-          ),
-          const SizedBox(height: AppSpacing.sm),
+          // Grid buttons row
           Row(
             children: [
               Expanded(
                 child: AppButton(
-                  label: 'My Bookings',
-                  onPressed: controller.viewMyBookings,
-                  variant: AppButtonVariant.secondary,
+                  label: 'View E-Ticket',
+                  onPressed: controller.viewETicket,
                 ),
               ),
               const SizedBox(width: AppSpacing.sm),
@@ -394,7 +427,7 @@ class BookingConfirmationView extends GetView<BookingConfirmationController> {
                 child: AppButton(
                   label: 'Back to Home',
                   onPressed: controller.goToHome,
-                  variant: AppButtonVariant.text,
+                  variant: AppButtonVariant.secondary,
                 ),
               ),
             ],

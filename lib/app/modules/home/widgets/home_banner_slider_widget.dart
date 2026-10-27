@@ -4,7 +4,8 @@ import 'package:flutter/material.dart';
 
 import '../../../core/constants/app_spacing.dart';
 
-/// Auto-scrolling banner slider for home screen header.
+/// Banner widget for home screen header.
+/// Shows static image for single banner, slider for multiple.
 class HomeBannerSlider extends StatefulWidget {
   const HomeBannerSlider({super.key});
 
@@ -13,39 +14,42 @@ class HomeBannerSlider extends StatefulWidget {
 }
 
 class _HomeBannerSliderState extends State<HomeBannerSlider> {
+  // Banner images list - add more images here to enable slider
+  final List<String> _bannerImages = const [
+    'assets/images/banners/home_banner.png',
+    // Add more banners here to enable slider:
+    // 'assets/images/banners/home_banner_2.png',
+  ];
+
   late final PageController _pageController;
   Timer? _autoScrollTimer;
   int _currentPage = 0;
 
-  // Banner images
-  static const List<String> _bannerImages = [
-    'assets/images/banners/home_banner.png',
-    'assets/images/banners/home_banner_2.png',
-  ];
-
-  // Duplicate for infinite scroll effect
-  List<String> get _banners => _bannerImages.length == 1
-      ? [..._bannerImages, ..._bannerImages, ..._bannerImages]
-      : _bannerImages;
+  bool get _isSingleImage => _bannerImages.length <= 1;
 
   @override
   void initState() {
     super.initState();
-    _pageController = PageController(initialPage: _bannerImages.length == 1 ? 1 : 0);
-    _startAutoScroll();
+    if (!_isSingleImage) {
+      _pageController = PageController();
+      _startAutoScroll();
+    }
   }
 
   @override
   void dispose() {
     _autoScrollTimer?.cancel();
-    _pageController.dispose();
+    if (!_isSingleImage) {
+      _pageController.dispose();
+    }
     super.dispose();
   }
 
   void _startAutoScroll() {
+    if (_isSingleImage) return;
+
     _autoScrollTimer = Timer.periodic(const Duration(seconds: 5), (_) {
       if (!mounted) return;
-
       final nextPage = (_currentPage + 1) % _bannerImages.length;
       _pageController.animateToPage(
         nextPage,
@@ -55,76 +59,78 @@ class _HomeBannerSliderState extends State<HomeBannerSlider> {
     });
   }
 
-  void _onPageChanged(int index) {
-    setState(() => _currentPage = index);
-
-    // For single image infinite loop - jump back to middle
-    if (_bannerImages.length == 1) {
-      if (index == 0) {
-        Future.delayed(const Duration(milliseconds: 50), () {
-          if (mounted) {
-            _pageController.jumpToPage(1);
-            setState(() => _currentPage = 1);
-          }
-        });
-      } else if (index == 2) {
-        Future.delayed(const Duration(milliseconds: 50), () {
-          if (mounted) {
-            _pageController.jumpToPage(1);
-            setState(() => _currentPage = 1);
-          }
-        });
-      }
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
+    // SINGLE IMAGE - static display, no slider
+    if (_isSingleImage) {
+      return _buildStaticBanner();
+    }
+
+    // MULTIPLE IMAGES - slider with indicators
+    return _buildSlider();
+  }
+
+  Widget _buildStaticBanner() {
+    return Opacity(
+      opacity: 0.4,
+      child: Image.asset(
+        _bannerImages.first,
+        fit: BoxFit.cover,
+        width: double.infinity,
+        height: double.infinity,
+        alignment: Alignment.topCenter,
+        errorBuilder: (_, __, ___) => Container(
+          color: const Color(0xFF174A8B),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSlider() {
     return Stack(
       children: [
-        // Banner PageView
         PageView.builder(
           controller: _pageController,
-          onPageChanged: _onPageChanged,
-          itemCount: _banners.length,
+          onPageChanged: (index) => setState(() => _currentPage = index),
+          itemCount: _bannerImages.length,
           itemBuilder: (context, index) {
             return Opacity(
-              opacity: 0.35,
+              opacity: 0.4,
               child: Image.asset(
-                _banners[index % _bannerImages.length],
+                _bannerImages[index],
                 fit: BoxFit.cover,
-                alignment: Alignment.center,
-                errorBuilder: (context, error, stackTrace) => const SizedBox(),
+                alignment: Alignment.topCenter,
+                errorBuilder: (_, __, ___) => Container(
+                  color: const Color(0xFF174A8B),
+                ),
               ),
             );
           },
         ),
-
-        // Page indicators (only show if multiple unique banners)
-        if (_bannerImages.length > 1)
-          Positioned(
-            bottom: AppSpacing.md,
-            left: 0,
-            right: 0,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: List.generate(
-                _bannerImages.length,
-                (index) => AnimatedContainer(
-                  duration: const Duration(milliseconds: 200),
-                  margin: const EdgeInsets.symmetric(horizontal: 3),
-                  width: (_currentPage % _bannerImages.length) == index ? 20 : 8,
-                  height: 8,
-                  decoration: BoxDecoration(
-                    color: (_currentPage % _bannerImages.length) == index
-                        ? Colors.white
-                        : Colors.white.withAlpha(100),
-                    borderRadius: BorderRadius.circular(4),
-                  ),
+        // Page indicators
+        Positioned(
+          bottom: AppSpacing.md,
+          left: 0,
+          right: 0,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: List.generate(
+              _bannerImages.length,
+              (index) => AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                margin: const EdgeInsets.symmetric(horizontal: 3),
+                width: _currentPage == index ? 20 : 8,
+                height: 8,
+                decoration: BoxDecoration(
+                  color: _currentPage == index
+                      ? Colors.white
+                      : Colors.white.withAlpha(100),
+                  borderRadius: BorderRadius.circular(4),
                 ),
               ),
             ),
           ),
+        ),
       ],
     );
   }

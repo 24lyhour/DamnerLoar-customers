@@ -42,6 +42,8 @@ import '../modules/start/views/start_view.dart';
 import '../modules/transport/bindings/transport_binding.dart';
 import '../modules/transport/booking_confirmation/bindings/booking_confirmation_binding.dart';
 import '../modules/transport/booking_confirmation/views/booking_confirmation_view.dart';
+import '../modules/transport/e_ticket/bindings/e_ticket_binding.dart';
+import '../modules/transport/e_ticket/views/e_ticket_view.dart';
 import '../modules/transport/passenger_info/bindings/passenger_info_binding.dart';
 import '../modules/transport/passenger_info/views/passenger_info_view.dart';
 import '../modules/transport/seat_selection/bindings/seat_selection_binding.dart';
@@ -99,6 +101,11 @@ class AppPages {
           name: _Paths.BOOKING_CONFIRMATION,
           page: () => const BookingConfirmationView(),
           binding: BookingConfirmationBinding(),
+        ),
+        GetPage(
+          name: _Paths.E_TICKET,
+          page: () => const ETicketView(),
+          binding: ETicketBinding(),
         ),
       ],
     ),
