@@ -22,7 +22,11 @@ abstract class Routes {
   static const TRIP_LIST = _Paths.TRANSPORT + _Paths.TRIP_LIST;
   static const BOOKING_CONFIRMATION = _Paths.TRANSPORT + _Paths.BOOKING_CONFIRMATION;
   static const E_TICKET = _Paths.TRANSPORT + _Paths.E_TICKET;
+  static const HOTEL_DETAIL = _Paths.HOTEL + _Paths.HOTEL_DETAIL;
   static const ROOM_SELECTION = _Paths.HOTEL + _Paths.ROOM_SELECTION;
+  static const ROOM_DETAIL = _Paths.HOTEL + _Paths.ROOM_DETAIL;
+  static const GUEST_INFO = _Paths.HOTEL + _Paths.GUEST_INFO;
+  static const HOTEL_VOUCHER = _Paths.HOTEL + _Paths.HOTEL_VOUCHER;
   static const SPLASH_SCREEN = _Paths.START + _Paths.SPLASH_SCREEN;
   static const LANGUAGE = _Paths.START + _Paths.LANGUAGE;
   static const LOGIN = _Paths.START + _Paths.LOGIN;
@@ -50,7 +54,11 @@ abstract class _Paths {
   static const TRIP_LIST = '/trip-list';
   static const BOOKING_CONFIRMATION = '/booking-confirmation';
   static const E_TICKET = '/e-ticket';
+  static const HOTEL_DETAIL = '/hotel-detail';
   static const ROOM_SELECTION = '/room-selection';
+  static const ROOM_DETAIL = '/room-detail';
+  static const GUEST_INFO = '/guest-info';
+  static const HOTEL_VOUCHER = '/hotel-voucher';
   static const SPLASH_SCREEN = '/splash-screen';
   static const LANGUAGE = '/language';
   static const LOGIN = '/login';

@@ -65,12 +65,58 @@ class HomeController extends GetxController {
   }
 
   void searchHotels() {
-    // TODO: Navigate to hotel results
-    Get.toNamed('/hotel');
+    Get.toNamed('/hotel', arguments: {
+      'location': hotelDestination.value,
+      'checkIn': checkInDate.value,
+      'checkOut': checkOutDate.value,
+      'rooms': roomCount.value,
+      'guests': guestCount.value,
+    });
   }
 
   void searchPackages() {
-    // TODO: Navigate to package results
     Get.toNamed('/package');
+  }
+
+  // Hotel destination options
+  static const hotelDestinations = [
+    'Siem Reap, Cambodia',
+    'Phnom Penh, Cambodia',
+    'Sihanoukville, Cambodia',
+    'Battambang, Cambodia',
+    'Kep, Cambodia',
+    'Kampot, Cambodia',
+  ];
+
+  void setHotelDestination(String destination) {
+    hotelDestination.value = destination;
+  }
+
+  void setCheckInDate(DateTime date) {
+    checkInDate.value = date;
+    // Ensure check-out is after check-in
+    if (checkOutDate.value.isBefore(date) || checkOutDate.value.isAtSameMomentAs(date)) {
+      checkOutDate.value = date.add(const Duration(days: 1));
+    }
+  }
+
+  void setCheckOutDate(DateTime date) {
+    checkOutDate.value = date;
+  }
+
+  void incrementGuests() {
+    if (guestCount.value < 10) guestCount.value++;
+  }
+
+  void decrementGuests() {
+    if (guestCount.value > 1) guestCount.value--;
+  }
+
+  void incrementRooms() {
+    if (roomCount.value < 5) roomCount.value++;
+  }
+
+  void decrementRooms() {
+    if (roomCount.value > 1) roomCount.value--;
   }
 }

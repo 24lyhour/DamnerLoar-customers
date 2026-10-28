@@ -8,6 +8,14 @@ import '../modules/booking/views/booking_view.dart';
 import '../modules/home/bindings/home_binding.dart';
 import '../modules/home/views/home_view.dart';
 import '../modules/hotel/bindings/hotel_binding.dart';
+import '../modules/hotel/guest_info/bindings/guest_info_binding.dart';
+import '../modules/hotel/guest_info/views/guest_info_view.dart';
+import '../modules/hotel/hotel_detail/bindings/hotel_detail_binding.dart';
+import '../modules/hotel/hotel_detail/views/hotel_detail_view.dart';
+import '../modules/hotel/hotel_voucher/bindings/hotel_voucher_binding.dart';
+import '../modules/hotel/room_detail/bindings/room_detail_binding.dart';
+import '../modules/hotel/room_detail/views/room_detail_view.dart';
+import '../modules/hotel/hotel_voucher/views/hotel_voucher_view.dart';
 import '../modules/hotel/room_selection/bindings/room_selection_binding.dart';
 import '../modules/hotel/room_selection/views/room_selection_view.dart';
 import '../modules/hotel/views/hotel_view.dart';
@@ -106,9 +114,29 @@ class AppPages {
       binding: HotelBinding(),
       children: [
         GetPage(
+          name: _Paths.HOTEL_DETAIL,
+          page: () => const HotelDetailView(),
+          binding: HotelDetailBinding(),
+        ),
+        GetPage(
           name: _Paths.ROOM_SELECTION,
           page: () => const RoomSelectionView(),
           binding: RoomSelectionBinding(),
+        ),
+        GetPage(
+          name: _Paths.ROOM_DETAIL,
+          page: () => const RoomDetailView(),
+          binding: RoomDetailBinding(),
+        ),
+        GetPage(
+          name: _Paths.GUEST_INFO,
+          page: () => const GuestInfoView(),
+          binding: GuestInfoBinding(),
+        ),
+        GetPage(
+          name: _Paths.HOTEL_VOUCHER,
+          page: () => const HotelVoucherView(),
+          binding: HotelVoucherBinding(),
         ),
       ],
     ),
