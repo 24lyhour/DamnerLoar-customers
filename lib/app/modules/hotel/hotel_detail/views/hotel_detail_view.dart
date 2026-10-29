@@ -28,7 +28,7 @@ class HotelDetailView extends GetView<HotelDetailController> {
                 _buildDescription(),
                 _buildAmenities(),
                 _buildRoomPreview(),
-                const SizedBox(height: 100),
+                const SizedBox(height: 120),
               ],
             ),
           ),
@@ -387,7 +387,7 @@ class HotelDetailView extends GetView<HotelDetailController> {
     final isSoldOut = room.isSoldOut;
 
     return Container(
-      margin: const EdgeInsets.only(bottom: AppSpacing.md),
+      margin: const EdgeInsets.only(bottom: AppSpacing.sm),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
@@ -405,12 +405,12 @@ class HotelDetailView extends GetView<HotelDetailController> {
           GestureDetector(
             onTap: () => controller.viewRoomDetail(room),
             child: Padding(
-              padding: const EdgeInsets.all(AppSpacing.md),
+              padding: const EdgeInsets.all(AppSpacing.sm),
               child: Row(
                 children: [
                   Container(
-                    width: 60,
-                    height: 60,
+                    width: 50,
+                    height: 50,
                     decoration: BoxDecoration(
                       color: isSoldOut
                           ? AppColor.textSecondary.withAlpha(20)
@@ -419,55 +419,55 @@ class HotelDetailView extends GetView<HotelDetailController> {
                     ),
                     child: Icon(
                       Icons.bed,
+                      size: 24,
                       color: isSoldOut ? AppColor.textSecondary : AppColor.primary,
                     ),
                   ),
-                  const SizedBox(width: AppSpacing.md),
+                  const SizedBox(width: AppSpacing.sm),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Row(
-                          children: [
-                            Expanded(
-                              child: Text(
-                                room.name,
-                                style: AppTextStyle.bodyMedium.copyWith(
-                                  fontWeight: FontWeight.w600,
-                                  color: isSoldOut ? AppColor.textSecondary : null,
-                                ),
-                              ),
-                            ),
-                            Icon(
-                              Icons.info_outline,
-                              size: 18,
-                              color: AppColor.textSecondary,
-                            ),
-                          ],
+                        Text(
+                          room.name,
+                          style: AppTextStyle.bodyMedium.copyWith(
+                            fontWeight: FontWeight.w600,
+                            color: isSoldOut ? AppColor.textSecondary : null,
+                          ),
                         ),
-                        const SizedBox(height: 4),
+                        const SizedBox(height: 2),
                         Text(
                           '${room.bedType} · ${room.sizeText} · ${room.maxGuests} guests',
                           style: AppTextStyle.caption.copyWith(color: AppColor.textSecondary),
                         ),
-                        const SizedBox(height: 4),
-                        Row(
-                          children: [
-                            Text(
-                              room.priceText,
-                              style: AppTextStyle.bodyMedium.copyWith(
-                                color: isSoldOut ? AppColor.textSecondary : AppColor.primary,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            Text(
-                              ' / night',
-                              style: AppTextStyle.caption.copyWith(color: AppColor.textSecondary),
-                            ),
-                          ],
-                        ),
                       ],
                     ),
+                  ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Row(
+                        children: [
+                          Text(
+                            room.priceText,
+                            style: AppTextStyle.bodyMedium.copyWith(
+                              color: isSoldOut ? AppColor.textSecondary : AppColor.primary,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(width: 4),
+                          Icon(
+                            Icons.info_outline,
+                            size: 16,
+                            color: AppColor.textSecondary,
+                          ),
+                        ],
+                      ),
+                      Text(
+                        '/ night',
+                        style: AppTextStyle.caption.copyWith(color: AppColor.textSecondary),
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -476,7 +476,7 @@ class HotelDetailView extends GetView<HotelDetailController> {
           // Select button
           Container(
             width: double.infinity,
-            padding: const EdgeInsets.fromLTRB(AppSpacing.md, 0, AppSpacing.md, AppSpacing.md),
+            padding: const EdgeInsets.fromLTRB(AppSpacing.sm, 0, AppSpacing.sm, AppSpacing.sm),
             child: isSoldOut
                 ? Container(
                     padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),

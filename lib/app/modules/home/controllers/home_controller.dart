@@ -1,5 +1,6 @@
 import 'package:get/get.dart';
 
+import '../../../core/helpers/toast_helper.dart';
 import '../../../routes/app_pages.dart';
 
 enum SearchTab { transport, hotel, package }
@@ -54,6 +55,20 @@ class HomeController extends GetxController {
   }
 
   void searchBuses() {
+    // Validation
+    if (fromCity.value == toCity.value) {
+      AppToast.error('Departure and destination cannot be the same');
+      return;
+    }
+    if (departureDate.value.isBefore(DateTime.now().subtract(const Duration(days: 1)))) {
+      AppToast.error('Departure date cannot be in the past');
+      return;
+    }
+    if (isRoundTrip.value && returnDateValue.value.isBefore(departureDate.value)) {
+      AppToast.error('Return date must be after departure date');
+      return;
+    }
+
     Get.toNamed(Routes.TRIP_LIST, arguments: {
       'from': fromCity.value,
       'to': toCity.value,
@@ -65,6 +80,17 @@ class HomeController extends GetxController {
   }
 
   void searchHotels() {
+    // Validation
+    if (checkInDate.value.isBefore(DateTime.now().subtract(const Duration(days: 1)))) {
+      AppToast.error('Check-in date cannot be in the past');
+      return;
+    }
+    if (checkOutDate.value.isBefore(checkInDate.value) ||
+        checkOutDate.value.isAtSameMomentAs(checkInDate.value)) {
+      AppToast.error('Check-out must be after check-in');
+      return;
+    }
+
     Get.toNamed('/hotel', arguments: {
       'location': hotelDestination.value,
       'checkIn': checkInDate.value,
@@ -75,8 +101,33 @@ class HomeController extends GetxController {
   }
 
   void searchPackages() {
-    Get.toNamed('/package');
+    // Validation
+    if (fromCity.value == toCity.value) {
+      AppToast.error('Departure and destination cannot be the same');
+      return;
+    }
+
+    Get.toNamed('/package', arguments: {
+      'from': fromCity.value,
+      'to': toCity.value,
+      'departDate': departureDate.value,
+      'returnDate': returnDateValue.value,
+      'travellers': guestCount.value,
+      'rooms': roomCount.value,
+    });
   }
+
+  // City options for transport/package
+  static const cities = [
+    'Phnom Penh',
+    'Siem Reap',
+    'Sihanoukville',
+    'Battambang',
+    'Kampot',
+    'Kep',
+    'Poipet',
+    'Banlung',
+  ];
 
   // Hotel destination options
   static const hotelDestinations = [
@@ -87,6 +138,25 @@ class HomeController extends GetxController {
     'Kep, Cambodia',
     'Kampot, Cambodia',
   ];
+
+  void setFromCity(String city) {
+    fromCity.value = city;
+  }
+
+  void setToCity(String city) {
+    toCity.value = city;
+  }
+
+  void setDepartureDate(DateTime date) {
+    departureDate.value = date;
+    if (returnDateValue.value.isBefore(date) || returnDateValue.value.isAtSameMomentAs(date)) {
+      returnDateValue.value = date.add(const Duration(days: 1));
+    }
+  }
+
+  void setReturnDate(DateTime date) {
+    returnDateValue.value = date;
+  }
 
   void setHotelDestination(String destination) {
     hotelDestination.value = destination;

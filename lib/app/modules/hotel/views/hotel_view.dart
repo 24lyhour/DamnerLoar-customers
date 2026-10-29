@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import '../../../core/constants/app_spacing.dart';
 import '../../../core/theme/app_color.dart';
 import '../../../core/theme/app_text_style.dart';
+import '../../../core/widgets/option_picker_sheet.dart';
 import '../controllers/hotel_controller.dart';
 import '../data/models/hotel_model.dart';
 
@@ -157,37 +158,27 @@ class HotelView extends GetView<HotelController> {
                 ),
               )),
           const SizedBox(width: AppSpacing.md),
-          Obx(() => PopupMenuButton<HotelSortOption>(
-                initialValue: controller.sortOption.value,
-                onSelected: controller.setSortOption,
-                child: Row(
-                  children: [
-                    const Icon(Icons.sort, size: 18, color: AppColor.textSecondary),
-                    const SizedBox(width: 4),
-                    Text(
-                      _sortLabel(controller.sortOption.value),
-                      style: AppTextStyle.bodySmall.copyWith(color: AppColor.primary),
-                    ),
-                  ],
+          Obx(() => GestureDetector(
+                onTap: () => _showSortSheet(Get.context!),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: 4),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(4),
+                    border: Border.all(color: AppColor.border),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.sort, size: 18, color: AppColor.textSecondary),
+                      const SizedBox(width: 4),
+                      Text(
+                        _sortLabel(controller.sortOption.value),
+                        style: AppTextStyle.bodySmall.copyWith(color: AppColor.primary),
+                      ),
+                      const SizedBox(width: 4),
+                      const Icon(Icons.keyboard_arrow_down, size: 18, color: AppColor.textSecondary),
+                    ],
+                  ),
                 ),
-                itemBuilder: (context) => [
-                  const PopupMenuItem(
-                    value: HotelSortOption.recommended,
-                    child: Text('Recommended'),
-                  ),
-                  const PopupMenuItem(
-                    value: HotelSortOption.priceLow,
-                    child: Text('Price: Low to High'),
-                  ),
-                  const PopupMenuItem(
-                    value: HotelSortOption.priceHigh,
-                    child: Text('Price: High to Low'),
-                  ),
-                  const PopupMenuItem(
-                    value: HotelSortOption.rating,
-                    child: Text('Rating'),
-                  ),
-                ],
               )),
         ],
       ),
@@ -204,6 +195,23 @@ class HotelView extends GetView<HotelController> {
         return 'Price: High';
       case HotelSortOption.rating:
         return 'Rating';
+    }
+  }
+
+  Future<void> _showSortSheet(BuildContext context) async {
+    final result = await OptionPickerSheet.show<HotelSortOption>(
+      context: context,
+      title: 'Sort By',
+      options: const [
+        OptionItem(value: HotelSortOption.recommended, label: 'Recommended', icon: Icons.recommend),
+        OptionItem(value: HotelSortOption.priceLow, label: 'Price: Low to High', icon: Icons.arrow_upward),
+        OptionItem(value: HotelSortOption.priceHigh, label: 'Price: High to Low', icon: Icons.arrow_downward),
+        OptionItem(value: HotelSortOption.rating, label: 'Rating', icon: Icons.star),
+      ],
+      selectedValue: controller.sortOption.value,
+    );
+    if (result != null) {
+      controller.setSortOption(result);
     }
   }
 

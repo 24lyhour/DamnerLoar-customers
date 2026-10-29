@@ -6,6 +6,9 @@ import '../../../core/constants/app_spacing.dart';
 import '../../../core/constants/app_string.dart';
 import '../../../core/theme/app_color.dart';
 import '../../../core/theme/app_text_style.dart';
+import '../../../core/widgets/counter_picker_sheet.dart';
+import '../../../core/widgets/date_picker_sheet.dart';
+import '../../../core/widgets/list_picker_sheet.dart';
 import '../controllers/home_controller.dart';
 
 class PackageSearchForm extends GetView<HomeController> {
@@ -27,12 +30,14 @@ class PackageSearchForm extends GetView<HomeController> {
                       icon: Icons.circle_outlined,
                       label: AppString.from.tr,
                       value: controller.fromCity,
+                      isFrom: true,
                     ),
                     const SizedBox(height: AppSpacing.sm),
                     _buildLocationField(
                       icon: Icons.location_on_outlined,
                       label: AppString.to.tr,
                       value: controller.toCity,
+                      isFrom: false,
                     ),
                   ],
                 ),
@@ -65,6 +70,7 @@ class PackageSearchForm extends GetView<HomeController> {
                       icon: Icons.calendar_today_outlined,
                       label: AppString.depart.tr,
                       date: controller.departureDate.value,
+                      isDepart: true,
                     )),
               ),
               const SizedBox(width: AppSpacing.sm),
@@ -73,6 +79,7 @@ class PackageSearchForm extends GetView<HomeController> {
                       icon: Icons.calendar_today_outlined,
                       label: AppString.returnDate.tr,
                       date: controller.returnDateValue.value,
+                      isDepart: false,
                     )),
               ),
             ],
@@ -80,7 +87,7 @@ class PackageSearchForm extends GetView<HomeController> {
           const SizedBox(height: AppSpacing.md),
 
           // Travellers & Rooms
-          _buildTravellersRoomsField(),
+          _buildTravellersRoomsField(onTap: () => _showTravellersRoomsPicker(Get.context!)),
           const SizedBox(height: AppSpacing.lg),
 
           // Search button
@@ -105,15 +112,64 @@ class PackageSearchForm extends GetView<HomeController> {
     );
   }
 
+  void _showLocationPicker(BuildContext context, bool isFrom) {
+    ListPickerSheet.show(
+      context: context,
+      title: isFrom ? 'Where from?' : 'Where to?',
+      items: HomeController.cities.map((c) => ListPickerItem(value: c)).toList(),
+      selectedValue: isFrom ? controller.fromCity.value : controller.toCity.value,
+      onSelected: isFrom ? controller.setFromCity : controller.setToCity,
+      leadingIcon: Icons.location_on,
+    );
+  }
+
+  void _showDatePicker(BuildContext context, bool isDepart) {
+    final initialDate = isDepart ? controller.departureDate.value : controller.returnDateValue.value;
+    final firstDate = isDepart ? DateTime.now() : controller.departureDate.value.add(const Duration(days: 1));
+
+    DatePickerSheet.show(
+      context: context,
+      title: isDepart ? 'Select Departure Date' : 'Select Return Date',
+      initialDate: initialDate,
+      firstDate: firstDate,
+      lastDate: DateTime.now().add(const Duration(days: 365)),
+      onDateSelected: isDepart ? controller.setDepartureDate : controller.setReturnDate,
+    );
+  }
+
+  void _showTravellersRoomsPicker(BuildContext context) {
+    CounterPickerSheet.show(
+      context: context,
+      title: 'Travellers & Rooms',
+      items: [
+        CounterItem(
+          label: 'Travellers',
+          value: controller.guestCount.value,
+          minValue: 1,
+          maxValue: 10,
+        ),
+        CounterItem(
+          label: 'Rooms',
+          value: controller.roomCount.value,
+          minValue: 1,
+          maxValue: 5,
+        ),
+      ],
+      onConfirm: (values) {
+        controller.guestCount.value = values[0];
+        controller.roomCount.value = values[1];
+      },
+    );
+  }
+
   Widget _buildLocationField({
     required IconData icon,
     required String label,
     required RxString value,
+    required bool isFrom,
   }) {
     return GestureDetector(
-      onTap: () {
-        // TODO: Open location picker
-      },
+      onTap: () => _showLocationPicker(Get.context!, isFrom),
       child: Container(
         padding: const EdgeInsets.all(AppSpacing.md),
         decoration: BoxDecoration(
@@ -154,11 +210,10 @@ class PackageSearchForm extends GetView<HomeController> {
     required IconData icon,
     required String label,
     required DateTime date,
+    required bool isDepart,
   }) {
     return GestureDetector(
-      onTap: () {
-        // TODO: Open date picker
-      },
+      onTap: () => _showDatePicker(Get.context!, isDepart),
       child: Container(
         padding: const EdgeInsets.all(AppSpacing.md),
         decoration: BoxDecoration(
@@ -195,11 +250,9 @@ class PackageSearchForm extends GetView<HomeController> {
     );
   }
 
-  Widget _buildTravellersRoomsField() {
+  Widget _buildTravellersRoomsField({required VoidCallback onTap}) {
     return GestureDetector(
-      onTap: () {
-        // TODO: Open travellers/rooms picker
-      },
+      onTap: onTap,
       child: Container(
         padding: const EdgeInsets.all(AppSpacing.md),
         decoration: BoxDecoration(
